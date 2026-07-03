@@ -1,0 +1,13 @@
+# === 機密の元資料は絶対に公開しない ===
+*.pdf
+*.xlsx
+*.png
+
+# === デプロイ対象外のローカルファイル ===
+tepco_reputation_dashboard*.html
+ladies_artnature_dashboard.html
+tepco_ai_market_twin_dashboard.html
+
+# OS/エディタ
+.DS_Store
+Thumbs.db

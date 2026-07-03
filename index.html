@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>東京電力エナジーパートナー｜法人AIマーケットツイン デモ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --white:#ffffff;
+  --bg:#F4F6F9;
+  --bg2:#EAEEF3;
+  --border:#E1E7EF;
+  --border2:#CBD5E1;
+  --primary:#E60012;          /* TEPCO RED */
+  --primary-d:#B8000E;
+  --primary-l:#FEECEE;
+  --primary-l2:#FBD0D5;
+  --navy:#0B2A4A;             /* accent navy */
+  --navy-l:#EAF1F8;
+  --blue:#0A6EBD;
+  --blue-l:#E9F2FB;
+  --nav-bg:#111826;
+  --nav-bg2:#1A2335;
+  --nav-text:#9FB0C9;
+  --nav-muted:#5C6C86;
+  --text:#0F1B2D;
+  --text2:#51617A;
+  --text3:#93A1B5;
+  --red:#DC2626;
+  --red-l:#FDECEC;
+  --red-l2:#FAD4D4;
+  --amber:#D97706;
+  --amber-l:#FFF6E9;
+  --amber-l2:#FCE7C4;
+  --green:#159A6C;
+  --green-l:#E9FAF3;
+  --green-l2:#C4EFDD;
+  --teal:#0E8AA0;
+  --purple:#7C4DBB;
+  --radius:6px;
+  --radius-lg:10px;
+  --shadow:0 1px 3px rgba(15,27,45,.07),0 0 0 1px rgba(15,27,45,.05);
+  --shadow-md:0 4px 16px rgba(15,27,45,.1),0 0 0 1px rgba(15,27,45,.05);
+  --font:'Noto Sans JP',system-ui,sans-serif;
+  --mono:'DM Mono','Courier New',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.6;min-height:100vh}
+
+/* TOP NAV */
+.topnav{background:var(--white);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;padding:0 16px;position:sticky;top:0;z-index:200}
+.tn-logo{margin-right:18px;flex-shrink:0;display:flex;align-items:center;gap:9px;height:52px}
+.tn-logo .mark{font-family:var(--mono);font-weight:700;color:var(--primary);font-size:20px;letter-spacing:-.03em}
+.tn-logo .txt{font-size:10px;color:var(--text2);font-weight:700;line-height:1.15}
+.tn-logo .txt span{color:var(--text3);font-weight:400;font-size:9px}
+.tn-divider{width:1px;height:26px;background:var(--border);margin-right:12px}
+.tn-steps{display:flex;align-items:center;gap:0;flex:1;overflow-x:auto}
+.tn-step{display:flex;align-items:center;gap:6px;padding:6px 10px;font-size:11px;color:var(--text3);cursor:pointer;border-radius:6px;transition:all .15s;white-space:nowrap;font-weight:500}
+.tn-step:hover{color:var(--text2);background:var(--bg)}
+.tn-step.active{background:var(--primary-l);color:var(--primary);font-weight:700}
+.tn-step .snum{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;background:var(--bg2);color:var(--text3)}
+.tn-step.active .snum{background:var(--primary);color:#fff}
+.tn-arrow{color:var(--border2);font-size:10px;padding:0 1px;flex-shrink:0}
+.tn-right{display:flex;align-items:center;gap:10px;margin-left:auto;flex-shrink:0;padding-left:12px}
+.live{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);font-weight:600}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.tn-btn{padding:7px 13px;border-radius:6px;font-size:11px;font-weight:700;background:var(--primary);color:#fff;border:none;cursor:pointer}
+
+/* LAYOUT */
+.shell{display:flex;min-height:calc(100vh - 52px)}
+.sidebar{width:210px;flex-shrink:0;background:var(--nav-bg);padding:16px 0 30px;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto}
+.main{flex:1;min-width:0;padding:20px 24px 40px}
+
+/* SIDEBAR */
+.sb-brand{margin:0 12px 14px;background:linear-gradient(135deg,rgba(230,0,18,.22),rgba(230,0,18,.06));border:1px solid rgba(230,0,18,.35);border-radius:var(--radius-lg);padding:13px}
+.sb-brand .lbl{font-size:9px;font-weight:700;color:#FF8A93;letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
+.sb-brand .val{font-size:27px;font-weight:900;font-family:var(--mono);color:#fff;line-height:1}
+.sb-brand .val small{font-size:12px;font-weight:500;color:var(--nav-text)}
+.sb-brand .sub{font-size:10px;color:var(--nav-text);margin-top:4px}
+.sb-brand .bar-t{height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin-top:9px;overflow:hidden;display:flex}
+.sb-brand .bar-f{height:100%;background:var(--primary)}
+.sb-brand .bar-g{height:100%;background:rgba(255,255,255,.2)}
+.sb-brand .barlbl{display:flex;justify-content:space-between;font-size:9px;color:var(--nav-muted);margin-top:4px}
+.sb-label{font-size:9px;font-weight:700;color:var(--nav-muted);letter-spacing:.11em;text-transform:uppercase;padding:12px 16px 4px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;color:var(--nav-text);font-size:11.5px;font-weight:400;transition:all .15s;border-left:2px solid transparent}
+.sb-item:hover{color:#fff;background:rgba(255,255,255,.05)}
+.sb-item.active{color:#fff;font-weight:700;border-left-color:var(--primary);background:rgba(230,0,18,.14)}
+.sb-item .ic{width:15px;text-align:center;font-size:12px;opacity:.75;flex-shrink:0}
+.sb-item.active .ic{opacity:1}
+.sb-item .n{margin-left:auto;font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;background:rgba(255,255,255,.08);color:var(--nav-text)}
+.sb-ds{padding:5px 16px;display:flex;align-items:center;gap:7px}
+.sb-ds .dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.sb-ds .nm{font-size:10px;color:var(--nav-text)}
+.sb-ds .ct{margin-left:auto;font-size:9px;color:var(--nav-muted);font-family:var(--mono)}
+
+/* HEADER / COMMON */
+.breadcrumb{font-size:11px;color:var(--text3);margin-bottom:11px;display:flex;align-items:center;gap:5px}
+.breadcrumb .cur{color:var(--text2);font-weight:600}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;box-shadow:var(--shadow)}
+.ph-left{display:flex;align-items:center;gap:13px}
+.ph-num{width:30px;height:30px;border-radius:8px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.ph-title{font-size:16px;font-weight:700}
+.ph-sub{font-size:11px;color:var(--text2);margin-top:1px}
+.ph-tag{font-size:10px;font-weight:700;padding:5px 11px;border-radius:20px;background:var(--navy-l);color:var(--navy)}
+
+.ai-bar{background:linear-gradient(90deg,var(--primary-l),#FFF5F6);border:1px solid var(--primary-l2);border-radius:var(--radius);padding:9px 14px;font-size:11.5px;color:var(--primary-d);margin-bottom:14px;display:flex;align-items:center;gap:8px;line-height:1.55}
+.ai-bar b{color:var(--primary)}
+.ai-bar .aic{font-size:13px;flex-shrink:0}
+
+.page-section{display:none;animation:fade .25s ease}
+.page-section.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+.g12{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:12px}
+.g31{display:grid;grid-template-columns:3fr 1.3fr;gap:12px;margin-bottom:12px}
+
+/* CARD */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:15px 16px;box-shadow:var(--shadow)}
+.card-hd{font-size:12.5px;font-weight:700;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-hd .sub{font-size:10px;color:var(--text3);font-weight:400;margin-top:1px}
+.card-hd .badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--bg2);color:var(--text2)}
+.chart-wrap{position:relative}
+
+/* KPI */
+.kpi{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 15px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi .k-lbl{font-size:10.5px;color:var(--text2);font-weight:600;display:flex;align-items:center;gap:5px}
+.kpi .k-val{font-size:29px;font-weight:900;font-family:var(--mono);line-height:1.05;margin-top:6px;letter-spacing:-.02em}
+.kpi .k-val small{font-size:13px;font-weight:500;color:var(--text3);font-family:var(--font)}
+.kpi .k-sub{font-size:10px;color:var(--text3);margin-top:3px}
+.kpi .k-strip{position:absolute;left:0;top:0;bottom:0;width:4px}
+.kpi .chip{position:absolute;top:12px;right:12px;font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px}
+.chip-up{background:var(--green-l);color:var(--green)}
+.chip-dn{background:var(--red-l);color:var(--red)}
+.chip-neu{background:var(--bg2);color:var(--text2)}
+
+/* tags & pills */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px}
+.p-red{background:var(--red-l);color:var(--red)}
+.p-amber{background:var(--amber-l);color:var(--amber)}
+.p-green{background:var(--green-l);color:var(--green)}
+.p-blue{background:var(--blue-l);color:var(--blue)}
+.p-navy{background:var(--navy-l);color:var(--navy)}
+.p-gray{background:var(--bg2);color:var(--text2)}
+.p-purple{background:#F1EAFB;color:var(--purple)}
+
+/* table */
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;font-weight:700;color:var(--text3);text-align:left;padding:8px 10px;border-bottom:1.5px solid var(--border);white-space:nowrap;text-transform:uppercase;letter-spacing:.03em}
+td{font-size:11.5px;padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr{transition:background .12s}
+tbody tr:hover{background:var(--bg)}
+.t-name{font-weight:700;color:var(--text)}
+.t-sub{font-size:10px;color:var(--text3)}
+.mono{font-family:var(--mono)}
+
+/* bar mini */
+.minibar{height:6px;border-radius:3px;background:var(--bg2);overflow:hidden;flex:1;min-width:40px}
+.minibar>span{display:block;height:100%;border-radius:3px}
+.barrow{display:flex;align-items:center;gap:8px}
+.barrow .bl{font-size:11px;width:88px;flex-shrink:0;color:var(--text2)}
+.barrow .bv{font-size:11px;font-family:var(--mono);font-weight:600;width:42px;text-align:right;flex-shrink:0}
+
+/* segment cards */
+.segcard{border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 13px;position:relative;overflow:hidden;background:var(--white)}
+.segcard .st{position:absolute;left:0;top:0;bottom:0;width:4px}
+.segcard .snm{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
+.segcard .sdesc{font-size:10.5px;color:var(--text2);margin:6px 0 9px;line-height:1.5;min-height:32px}
+.segcard .srow{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);padding:3px 0;border-top:1px dashed var(--border)}
+.segcard .srow b{font-family:var(--mono);font-weight:700;color:var(--text)}
+
+/* cluster */
+.clcard{border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;background:var(--white);box-shadow:var(--shadow);cursor:pointer;transition:all .15s}
+.clcard:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.clcard .ct-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.clcard .cico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.clcard .cn{font-size:13px;font-weight:700}
+.clcard .cc{font-size:22px;font-weight:900;font-family:var(--mono)}
+.clcard .cc small{font-size:11px;color:var(--text3);font-weight:500}
+.clcard .cdesc{font-size:10.5px;color:var(--text2);line-height:1.5;margin:6px 0 9px}
+.clcard .ctags{display:flex;flex-wrap:wrap;gap:4px}
+
+/* matrix */
+.matrix{display:grid;grid-template-columns:70px repeat(4,1fr);gap:5px}
+.matrix .mh{font-size:10px;font-weight:700;color:var(--text2);display:flex;align-items:center;justify-content:center;text-align:center;padding:5px 2px}
+.matrix .ml{font-size:10px;font-weight:700;color:var(--text2);display:flex;align-items:center;justify-content:flex-end;padding-right:8px}
+.mcell{border-radius:6px;padding:9px 6px;text-align:center;color:#fff;position:relative}
+.mcell .mv{font-size:16px;font-weight:900;font-family:var(--mono);line-height:1}
+.mcell .mp{font-size:9px;opacity:.9;margin-top:2px}
+.mcell.clk{cursor:pointer;transition:transform .1s,box-shadow .1s}
+.mcell.clk:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.mcell .star{position:absolute;top:3px;right:5px;font-size:10px}
+/* overview matrix with totals */
+.matrix-ov{display:grid;grid-template-columns:84px repeat(4,1fr) 80px;gap:5px}
+.matrix-ov .mh{font-size:10.5px;font-weight:700;color:var(--text2);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:5px 2px;line-height:1.25}
+.matrix-ov .mh small{font-size:8.5px;font-weight:700;margin-top:2px;padding:1px 5px;border-radius:20px}
+.matrix-ov .ml{font-size:10.5px;font-weight:700;color:var(--text2);display:flex;align-items:center;justify-content:flex-end;padding-right:8px}
+.mtot{background:var(--bg2);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 3px;color:var(--text)}
+.mtot .mv{font-size:15px;font-weight:900;font-family:var(--mono);line-height:1}
+.mtot .mp{font-size:8px;color:var(--text3);margin-top:2px}
+.mtot.grand{background:var(--navy);color:#fff}
+.mtot.grand .mp{color:#B9CCE0}
+
+/* 12業態 breakdown */
+.biz12{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.bizcol{display:flex;flex-direction:column;gap:8px}
+.bizhd{border-radius:9px;padding:11px 13px;position:relative;border:1px solid var(--border);min-height:78px}
+.bizhd.price{background:linear-gradient(135deg,#EAF1F8,#F5F9FC);border-color:#C9DDF0}
+.bizhd.value{background:linear-gradient(135deg,#FEECEE,#FFF6F7);border-color:var(--primary-l2)}
+.bizhd .bh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.bizhd .bh-ic{font-size:17px}
+.bizhd .bh-nm{font-size:13px;font-weight:700}
+.bizhd .bh-c{font-size:9.5px;color:var(--text2);margin-top:1px}
+.bizhd .bh-n{position:absolute;top:10px;right:40px;font-family:var(--mono);font-weight:900;font-size:15px;display:none}
+.bizcard{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:9px 11px;transition:.12s;cursor:pointer}
+.bizcard:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+.bizcard .bc-nm{font-size:11.5px;font-weight:700}
+.bizcard .bc-r{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.bizcard .bc-c{font-size:10px}
+.bizcard .bc-n{font-family:var(--mono);font-weight:700;font-size:12px;color:var(--text)}
+.bizcard .bc-n small{font-size:9px;color:var(--text3);font-weight:400}
+.bizcard.sel{border-color:var(--primary);background:var(--primary-l);box-shadow:var(--shadow)}
+.drow{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:7px;border:1px solid var(--border);margin-bottom:6px;cursor:pointer;transition:.12s;background:var(--white)}
+.drow:hover{border-color:var(--border2);background:var(--bg)}
+.drow.sel{border-color:var(--primary);background:var(--primary-l)}
+.drow .dn{font-size:11.5px;font-weight:600;width:132px;flex-shrink:0}
+.drow .dc{font-family:var(--mono);font-weight:700;font-size:12px;width:60px;text-align:right;flex-shrink:0}
+.drow .darr{color:var(--text3);font-size:10px;flex-shrink:0}
+.brow{display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:7px;background:var(--bg);margin-bottom:6px}
+.brow .bn{font-size:11px;width:118px;flex-shrink:0;color:var(--text2)}
+.brow .bc{font-family:var(--mono);font-weight:700;font-size:11.5px;width:56px;text-align:right;flex-shrink:0}
+/* persona selector + resolution */
+select.selctl{font-family:var(--font);font-size:12px;font-weight:600;padding:9px 12px;border:1px solid var(--border2);border-radius:8px;background:var(--white);color:var(--text);min-width:300px;cursor:pointer}
+.resmeter{flex:1;min-width:220px}
+.resmeter .rt{display:flex;justify-content:space-between;font-size:10px;color:var(--text2);margin-bottom:4px}
+.resmeter .rt b{font-family:var(--mono);font-size:15px;color:var(--green)}
+.resbar{height:10px;border-radius:6px;background:var(--bg2);overflow:hidden}
+.resbar>span{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:6px;transition:width .5s}
+/* persona 6 fields */
+.pfield{border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin-bottom:8px;background:var(--bg)}
+.pfield .pf-h{font-size:10.5px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.pfield .pf-h .num{width:16px;height:16px;border-radius:4px;background:var(--navy);color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pfield .pf-v{font-size:11px;color:var(--text);line-height:1.55}
+.pfield.star{border-color:var(--primary-l2);background:var(--primary-l)}
+.pfield.star .pf-h{color:var(--primary)}
+.pfield.star .num{background:var(--primary)}
+/* interview chat */
+.ivlog{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;height:288px;overflow-y:auto;display:flex;flex-direction:column;gap:9px}
+.ivq{align-self:flex-end;max-width:84%;background:var(--navy);color:#fff;padding:8px 12px;border-radius:12px 12px 3px 12px;font-size:11.5px;line-height:1.5}
+.iva{align-self:flex-start;max-width:88%;background:var(--white);border:1px solid var(--border);padding:8px 12px;border-radius:12px 12px 12px 3px;font-size:11.5px;line-height:1.6;box-shadow:var(--shadow)}
+.iva .who{font-size:9px;font-weight:700;color:var(--primary);margin-bottom:2px;display:flex;align-items:center;gap:4px}
+.ivchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.ivchip{padding:6px 11px;border-radius:20px;font-size:10.5px;font-weight:600;background:var(--white);border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:.12s}
+.ivchip:hover{border-color:var(--navy);color:var(--navy);background:var(--navy-l)}
+.ivinput{display:flex;gap:8px;margin-top:10px}
+.ivinput input{flex:1;padding:9px 12px;border:1px solid var(--border2);border-radius:8px;font-family:var(--font);font-size:11.5px}
+.ivinput button{padding:9px 15px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-weight:700;font-size:11.5px;cursor:pointer;white-space:nowrap}
+/* 営業履歴タイムライン (p3) */
+.tl{position:relative;margin-top:4px}
+.tl .ti{position:relative;padding:0 0 13px 16px;border-left:2px solid var(--border)}
+.tl .ti:last-child{padding-bottom:0}
+.tl .ti::before{content:'';position:absolute;left:-6px;top:1px;width:10px;height:10px;border-radius:50%;background:var(--navy);border:2px solid #fff;box-shadow:0 0 0 1px var(--border2)}
+.tl .ti.win::before{background:var(--green)}
+.tl .ti.loss::before{background:var(--red)}
+.tl .td{font-size:9.5px;color:var(--text3);font-family:var(--mono)}
+.tl .tt{font-size:11.5px;font-weight:700;margin-top:1px}
+.tl .tx{font-size:10.5px;color:var(--text2);line-height:1.5}
+/* 営業アクション実施有無 (p3) */
+.actck{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px dashed var(--border)}
+.actck:last-child{border:none}
+.actck .ck{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.ck.done{background:var(--green-l);color:var(--green)}
+.ck.no{background:var(--bg2);color:var(--text3)}
+.ck.mid{background:var(--amber-l);color:var(--amber)}
+.actck .an{font-size:11.5px;font-weight:600;flex:1}
+.actck .ax{font-size:10px;color:var(--text3)}
+/* action-plan card (p5) */
+.aplan{border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:0;background:var(--white)}
+.aplan .ap-body ul{list-style:none;margin-top:4px}
+.aplan .ap-body li{padding-left:13px;position:relative;line-height:1.7}
+.aplan .ap-body li::before{content:'・';position:absolute;left:0;color:var(--primary)}
+.sup-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.sup-head .st{font-size:14px;font-weight:700}
+.sup-head .sd{font-size:11px;color:var(--text2)}
+/* summary cards */
+.sumcard{border:1px solid var(--border);border-radius:10px;padding:13px 14px;background:var(--white);box-shadow:var(--shadow);cursor:pointer;transition:.14s;position:relative}
+.sumcard:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--border2)}
+.sumcard .sc-n{font-size:11px;font-weight:700;color:var(--primary)}
+.sumcard .sc-t{font-size:13px;font-weight:700;margin:2px 0 5px}
+.sumcard .sc-d{font-size:10.5px;color:var(--text2);line-height:1.55;min-height:46px}
+.sumcard .sc-f{display:flex;align-items:center;justify-content:space-between;margin-top:8px;border-top:1px dashed var(--border);padding-top:7px}
+.sumcard .sc-f .k{font-size:9.5px;color:var(--text3)}
+.sumcard .go{position:absolute;top:12px;right:13px;font-size:11px;color:var(--text3)}
+/* churn list score bar */
+.scorebar{height:7px;border-radius:4px;background:var(--bg2);overflow:hidden;width:70px;display:inline-block;vertical-align:middle;margin-right:6px}
+.scorebar>span{display:block;height:100%;border-radius:4px}
+/* proposal document */
+.doc{background:#fff;border:1px solid var(--border2);border-radius:10px;box-shadow:var(--shadow-md);overflow:hidden;max-width:660px;margin:4px auto 0}
+.doc .doc-hd{background:var(--navy);color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
+.doc .doc-hd .dmark{font-family:var(--mono);font-weight:700;color:#fff;font-size:16px}
+.doc .doc-hd .dt{font-size:14px;font-weight:700}
+.doc .doc-hd .dtag{font-size:9px;opacity:.8}
+.doc .doc-bd{padding:18px 22px}
+.doc .to{font-size:13px;font-weight:700;margin-bottom:3px}
+.doc .lead{font-size:11px;color:var(--text2);margin-bottom:14px}
+.doc .ds{margin-bottom:13px}
+.doc .dsh{font-size:11px;font-weight:700;color:var(--primary);border-left:3px solid var(--primary);padding-left:8px;margin-bottom:5px}
+.doc .dsb{font-size:11.5px;line-height:1.75;color:var(--text2);padding-left:11px}
+.doc .sim{display:flex;align-items:center;gap:10px;background:var(--green-l);border:1px solid var(--green-l2);border-radius:8px;padding:12px 14px;margin-left:11px}
+.doc .sim .big{font-family:var(--mono);font-size:22px;font-weight:900;color:var(--green)}
+.doc .sim .arw{font-size:18px;color:var(--text3)}
+.doc .doc-ft{border-top:1px solid var(--border);padding:10px 22px;font-size:10px;color:var(--text3);display:flex;justify-content:space-between}
+.aplan .ap-hd{display:flex;align-items:center;gap:11px;padding:13px 16px;border-bottom:1px solid var(--border)}
+.aplan .ap-ic{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.aplan .ap-cat{font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.03em}
+.aplan .ap-t{font-weight:700;font-size:13.5px;margin-top:1px}
+.aplan .ap-body{padding:14px 16px;font-size:12px;line-height:1.8;color:var(--text2)}
+.aplan .ap-foot{display:flex;gap:26px;padding:11px 16px;border-top:1px dashed var(--border);background:var(--bg);flex-wrap:wrap}
+.aplan .ap-foot .k{font-size:9.5px;color:var(--text3);font-weight:600}
+.aplan .ap-foot .v{font-size:11.5px;font-weight:700;margin-top:1px}
+.ap-kv{display:flex;flex-direction:column}
+/* 4 procurement routes */
+.route{border:1px solid var(--border);border-radius:9px;padding:12px;position:relative;background:var(--bg)}
+.route .rico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:6px}
+.route .rn{font-size:12px;font-weight:700}
+.route .rd{font-size:10px;color:var(--text2);margin-top:3px;line-height:1.5}
+.route .rload{position:absolute;top:11px;right:12px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px}
+/* detail panels */
+.dl{display:flex;flex-direction:column;gap:0}
+.dl .dr{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:11.5px}
+.dl .dr:last-child{border-bottom:none}
+.dl .dk{color:var(--text2)}
+.dl .dv{font-weight:700;text-align:right}
+.gauge{width:130px;height:130px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;position:relative}
+.gauge .ginner{width:96px;height:96px;background:var(--white);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge .gv{font-size:30px;font-weight:900;font-family:var(--mono);line-height:1}
+.gauge .gl{font-size:9px;color:var(--text3);font-weight:600}
+
+/* GIS map */
+.map-wrap{position:relative;background:linear-gradient(160deg,#EAF1F8,#F4F8FC);border:1px solid var(--border);border-radius:var(--radius-lg);height:560px;overflow:hidden}
+.map-region{position:absolute;border-radius:14px;background:rgba(11,42,74,.05);border:1px dashed rgba(11,42,74,.14)}
+.map-region .rlbl{position:absolute;top:6px;left:9px;font-size:10px;font-weight:700;color:var(--navy);opacity:.5}
+.heat{position:absolute;border-radius:50%;filter:blur(22px);pointer-events:none}
+.pin{position:absolute;width:13px;height:13px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:1.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:pointer;transition:transform .12s}
+.pin:hover{transform:rotate(-45deg) scale(1.5);z-index:20}
+.pin.big{width:19px;height:19px;z-index:12}
+.pin.risk{animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.5)}50%{box-shadow:0 0 0 6px rgba(220,38,38,0)}}
+.svgpin{transition:opacity .12s}
+.svgpin:hover{opacity:.6}
+.riskpin{animation:pulse2 1.7s infinite}
+@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.4}}
+.pref{transition:fill .15s}
+.pref:hover{fill:#FDE3E5}
+.map-legend{position:absolute;bottom:14px;left:14px;background:rgba(255,255,255,.95);border:1px solid var(--border);border-radius:8px;padding:10px 12px;box-shadow:var(--shadow-md)}
+.map-legend .lgi{display:flex;align-items:center;gap:7px;font-size:10.5px;padding:2px 0;color:var(--text2)}
+.map-legend .lgd{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.layer-toggle{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--border);font-size:11px}
+.layer-toggle:last-child{border:none}
+.tog{width:34px;height:19px;border-radius:20px;background:var(--border2);position:relative;cursor:pointer;transition:.15s;flex-shrink:0}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:.15s}
+.tog.on{background:var(--primary)}
+.tog.on::after{left:17px}
+
+/* action / talk */
+.actrow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.actrow:last-child{border:none}
+.actrow .arank{width:24px;height:24px;border-radius:7px;background:var(--navy);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.actrow .anm{font-weight:700;font-size:12px}
+.actrow .ad{font-size:10px;color:var(--text3)}
+.trigger{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:var(--bg);border:1px solid var(--border);margin-bottom:8px}
+.trigger .tic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+
+.talk-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.talk-tab{padding:7px 14px;border-radius:7px;font-size:11px;font-weight:600;background:var(--white);border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:.15s}
+.talk-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.talk-body{display:none}
+.talk-body.active{display:block}
+.talk-out{background:var(--navy-l);border:1px solid #C9DDF0;border-left:4px solid var(--navy);border-radius:8px;padding:16px 18px;font-size:13px;line-height:1.85;color:var(--text);white-space:pre-line}
+.talk-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.selbox{background:var(--white);border:1px solid var(--border2);border-radius:7px;padding:8px 11px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:7px}
+.selbox .sl{color:var(--text3);font-weight:400;font-size:10px}
+
+/* filter chips */
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.fchip{padding:6px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--white);border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:.15s}
+.fchip.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.fchip .fc-n{opacity:.7;margin-left:3px}
+
+.note{font-size:10.5px;color:var(--text3);line-height:1.6}
+.two-front{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tf{border-radius:var(--radius-lg);padding:14px 16px;border:1px solid var(--border)}
+.tf.price{background:linear-gradient(135deg,#EAF1F8,#F5F9FC);border-color:#C9DDF0}
+.tf.value{background:linear-gradient(135deg,#FEECEE,#FFF6F7);border-color:var(--primary-l2)}
+.tf .tf-h{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.tf ul{list-style:none;font-size:11px;color:var(--text2);line-height:1.75}
+.tf li{padding-left:14px;position:relative}
+.tf li::before{content:'▸';position:absolute;left:0;color:var(--primary)}
+
+.flow{display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-size:10.5px}
+.flow .fstep{padding:5px 11px;border-radius:6px;background:var(--bg2);color:var(--text2);font-weight:600}
+.flow .fstep.on{background:var(--primary);color:#fff}
+.flow .far{color:var(--border2)}
+h4.sec{font-size:11px;font-weight:700;color:var(--text2);margin:2px 0 10px;letter-spacing:.02em}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="topnav">
+  <div class="tn-logo">
+    <span class="mark">TEPCO</span>
+    <span class="txt">法人AIマーケットツイン<br><span>東京電力エナジーパートナー</span></span>
+  </div>
+  <div class="tn-divider"></div>
+  <div class="tn-steps">
+    <div class="tn-step active" data-page="p1" onclick="showPage('p1',this)"><span class="snum">1</span>Market Overview</div>
+    <span class="tn-arrow">▸</span>
+    <div class="tn-step" data-page="p2" onclick="showPage('p2',this)"><span class="snum">2</span>ペルソナ一覧</div>
+    <span class="tn-arrow">▸</span>
+    <div class="tn-step" data-page="p4" onclick="showPage('p4',this)"><span class="snum">3</span>GISマップ</div>
+    <span class="tn-arrow">▸</span>
+    <div class="tn-step" data-page="p3" onclick="showPage('p3',this)"><span class="snum">4</span>個社詳細</div>
+    <span class="tn-arrow">▸</span>
+    <div class="tn-step" data-page="p5" onclick="showPage('p5',this)"><span class="snum">5</span>推奨アクション</div>
+    <span class="tn-arrow">▸</span>
+    <div class="tn-step" data-page="p6" onclick="showPage('p6',this)"><span class="snum">6</span>トーク生成</div>
+    <span class="tn-arrow">▸</span>
+    <div class="tn-step" data-page="p7" onclick="showPage('p7',this)"><span class="snum">7</span>優先対応リスト</div>
+  </div>
+  <div class="tn-right">
+    <div class="live"><span class="live-dot"></span>AI推論 稼働中</div>
+    <button class="tn-btn">レポート出力</button>
+  </div>
+</div>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="lbl">再現済み法人顧客</div>
+      <div class="val">15,000<small> 社</small></div>
+      <div class="sub">AI上で個社再現・日次で推論更新</div>
+      <div class="bar-t"><div class="bar-f" style="width:20%"></div><div class="bar-g" style="width:80%"></div></div>
+      <div class="barlbl"><span>ケア済 3,000</span><span>未ケア 12,000</span></div>
+    </div>
+
+    <div class="sb-label">分析メニュー</div>
+    <div class="sb-item active" data-page="p1" onclick="showPage('p1',this)"><span class="ic">◈</span>Market Overview</div>
+    <div class="sb-item" data-page="p2" onclick="showPage('p2',this)"><span class="ic">◎</span>AIペルソナ／クラスタ<span class="n">5+12</span></div>
+    <div class="sb-item" data-page="p4" onclick="showPage('p4',this)"><span class="ic">◇</span>GIS／エリアマップ</div>
+    <div class="sb-item" data-page="p3" onclick="showPage('p3',this)"><span class="ic">▤</span>個社詳細カルテ</div>
+    <div class="sb-item" data-page="p5" onclick="showPage('p5',this)"><span class="ic">➤</span>営業アクション推奨</div>
+    <div class="sb-item" data-page="p6" onclick="showPage('p6',this)"><span class="ic">✎</span>営業トーク生成</div>
+    <div class="sb-item" data-page="p7" onclick="showPage('p7',this)"><span class="ic">☰</span>優先対応リスト<span class="n">12k</span></div>
+
+    <div class="sb-label">学習データソース</div>
+    <div class="sb-ds"><span class="dot"></span><span class="nm">Sansan / Eight 名刺</span><span class="ct">440万ID</span></div>
+    <div class="sb-ds"><span class="dot"></span><span class="nm">DMI 法人パネル調査</span><span class="ct">47万ss</span></div>
+    <div class="sb-ds"><span class="dot"></span><span class="nm">TEPCO 契約・営業履歴</span><span class="ct">15,000社</span></div>
+    <div class="sb-ds"><span class="dot" style="background:var(--amber)"></span><span class="nm">負荷曲線／スマメ</span><span class="ct">★独自</span></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+  <!-- ============ PAGE 1 : MARKET OVERVIEW ============ -->
+  <section id="p1" class="page-section active">
+    <div class="breadcrumb">TEPCO 法人AIマーケットツイン <span>›</span> <span class="cur">Market Overview</span></div>
+    <div class="page-header">
+      <div class="ph-left">
+        <div class="ph-num">1</div>
+        <div><div class="ph-title">Market Overview ── 15,000社の全体像</div>
+        <div class="ph-sub">どの顧客群に営業リソースを割くべきかを、ロイヤリティ・離反リスク・需要規模から俯瞰する</div></div>
+      </div>
+      <div class="ph-tag">全社 / 2026年6月 推論</div>
+    </div>
+
+    <div class="ai-bar"><span class="aic">✦</span><span><b>AIサマリ：</b>未ケア12,000社のうち <b>離反見込1,640社</b> が今後6か月で流出リスク。特に<b>商業・飲食×小口下</b>（価格感応）に集中。一方 <b>製造・物流／医療介護の中口上</b> はロイヤル化余地が大きく、営業を価値訴求ゾーンへ再配置すべき局面。</span></div>
+
+    <!-- KPI ROW -->
+    <div class="g5">
+      <div class="kpi"><div class="k-strip" style="background:var(--navy)"></div><div class="k-lbl">全法人顧客</div><div class="k-val">15,000<small> 社</small></div><div class="k-sub">AI上で個社再現済み</div></div>
+      <div class="kpi"><div class="k-strip" style="background:var(--green)"></div><span class="chip chip-neu">20%</span><div class="k-lbl">営業ケア済み</div><div class="k-val">3,000<small> 社</small></div><div class="k-sub">営業400–500名が伴走</div></div>
+      <div class="kpi"><div class="k-strip" style="background:var(--primary)"></div><span class="chip chip-up">開拓余地</span><div class="k-lbl">未ケア（AI捕捉対象）</div><div class="k-val">12,000<small> 社</small></div><div class="k-sub">仕組みで捕捉する層</div></div>
+      <div class="kpi"><div class="k-strip" style="background:var(--blue)"></div><span class="chip chip-up">+3.2%</span><div class="k-lbl">ロイヤル顧客</div><div class="k-val">4,180<small> 社</small></div><div class="k-sub">高LTV・継続意向高</div></div>
+      <div class="kpi"><div class="k-strip" style="background:var(--red)"></div><span class="chip chip-dn">要対応</span><div class="k-lbl">離反見込み</div><div class="k-val">1,640<small> 社</small></div><div class="k-sub">6か月内 流出リスク</div></div>
+    </div>
+
+    <div class="g3">
+      <div class="card"><div class="card-hd">営業ケア状況<span class="badge">全15,000社</span></div><div class="chart-wrap" style="height:200px"><canvas id="c_care"></canvas></div></div>
+      <div class="card"><div class="card-hd">顧客ステータス構成<span class="badge">ロイヤリティ推定</span></div><div class="chart-wrap" style="height:200px"><canvas id="c_status"></canvas></div></div>
+      <div class="card"><div class="card-hd">需要規模別の分布<span class="badge">契約電力</span></div><div class="chart-wrap" style="height:200px"><canvas id="c_scale"></canvas></div></div>
+    </div>
+
+    <!-- SEGMENTATION MATRIX (Market Overview の考え方) -->
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-hd">■ セグメンテーション設計 ── 需要規模 × 業種業態（各マス＝対象社数）
+        <span class="sub">この二軸マトリクスが全15,000社を理解・配分する土台。マス目をクリックでペルソナ詳細へ</span></div>
+      <div class="matrix-ov" style="margin-top:8px">
+        <!-- header -->
+        <div class="mh"><span style="font-size:9px;color:var(--text3)">需要規模＼業種業態</span></div>
+        <div class="mh">オフィス<small class="p-blue">価格感応</small></div>
+        <div class="mh">商業飲食<small class="p-blue">価格感応</small></div>
+        <div class="mh">医療介護<small class="p-red">価値訴求</small></div>
+        <div class="mh">工場他<small class="p-red">価値訴求</small></div>
+        <div class="mh" style="color:var(--text)">計</div>
+        <!-- 中口上 -->
+        <div class="ml">中口上</div>
+        <div class="mcell clk" style="background:#9DBFDD;color:#0F1B2D" onclick="goPersona()"><div class="mv">210</div><div class="mp">価格感応</div></div>
+        <div class="mcell clk" style="background:#9DBFDD;color:#0F1B2D" onclick="goPersona()"><div class="mv">180</div><div class="mp">価格感応</div></div>
+        <div class="mcell clk" style="background:#E8636F;color:#fff" onclick="goPersona()"><div class="mv">780</div><div class="mp">価値訴求</div></div>
+        <div class="mcell clk" style="background:var(--primary);color:#fff" onclick="goPersona()"><span class="star">★</span><div class="mv">1,150</div><div class="mp">価値訴求</div></div>
+        <div class="mtot"><div class="mv">2,320</div><div class="mp">中口上 計</div></div>
+        <!-- 中口下 -->
+        <div class="ml">中口下</div>
+        <div class="mcell clk" style="background:#7EA9CF;color:#fff" onclick="goPersona()"><div class="mv">720</div><div class="mp">価格感応</div></div>
+        <div class="mcell clk" style="background:#5E93C6;color:#fff" onclick="goPersona()"><div class="mv">1,240</div><div class="mp">価格感応</div></div>
+        <div class="mcell clk" style="background:#E8636F;color:#fff" onclick="goPersona()"><div class="mv">1,420</div><div class="mp">価値訴求</div></div>
+        <div class="mcell clk" style="background:#E85560;color:#fff" onclick="goPersona()"><div class="mv">1,540</div><div class="mp">価値訴求</div></div>
+        <div class="mtot"><div class="mv">4,920</div><div class="mp">中口下 計</div></div>
+        <!-- 小口下 -->
+        <div class="ml">小口下</div>
+        <div class="mcell clk" style="background:#5E93C6;color:#fff" onclick="goPersona()"><div class="mv">1,870</div><div class="mp">価格感応</div></div>
+        <div class="mcell clk" style="background:#2E6DA4;color:#fff" onclick="goPersona()"><span class="star">★</span><div class="mv">3,580</div><div class="mp">価格感応</div></div>
+        <div class="mcell clk" style="background:#EFA0A6;color:#0F1B2D" onclick="goPersona()"><div class="mv">1,180</div><div class="mp">価値訴求</div></div>
+        <div class="mcell clk" style="background:#EFA0A6;color:#0F1B2D" onclick="goPersona()"><div class="mv">1,130</div><div class="mp">価値訴求</div></div>
+        <div class="mtot"><div class="mv">7,760</div><div class="mp">小口下 計</div></div>
+        <!-- totals row -->
+        <div class="ml" style="color:var(--text)">計</div>
+        <div class="mtot"><div class="mv">2,800</div><div class="mp">オフィス</div></div>
+        <div class="mtot"><div class="mv">5,000</div><div class="mp">商業飲食</div></div>
+        <div class="mtot"><div class="mv">3,380</div><div class="mp">医療介護</div></div>
+        <div class="mtot"><div class="mv">3,820</div><div class="mp">工場他</div></div>
+        <div class="mtot grand"><div class="mv">15,000</div><div class="mp">全法人顧客</div></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:12px">
+        <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--text2)"><span style="width:34px;height:12px;border-radius:3px;background:linear-gradient(90deg,#9DBFDD,#2E6DA4);display:inline-block"></span>価格感応型（量で攻める）＝<b>7,800社</b></div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--text2)"><span style="width:34px;height:12px;border-radius:3px;background:linear-gradient(90deg,#EFA0A6,var(--primary));display:inline-block"></span>価値訴求型（質で固める）＝<b>7,200社</b></div>
+        <div style="font-size:10.5px;color:var(--text3)">★＝優先対応セグメント／濃淡＝対象社数の多寡</div>
+      </div>
+      <div class="note" style="margin-top:8px">縦に需要規模（小口下／中口下／中口上）、横に業種業態（電力の使われ方＝負荷曲線で束ねた4束）。営業の打ち手が変わる境目で切り、12業態→60→180の打ち手単位まで分解可能。</div>
+    </div>
+
+    <!-- 12業態への分解（粒度1） -->
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-hd">横軸の4束を、電力の使われ方を起点に12業態へ分解する
+        <span class="sub">業態カードをクリックすると、60の最小単位（粒度2）ごとの対象社数が下に表示されます</span>
+        <span class="badge" style="background:var(--primary);color:#fff">粒度1</span></div>
+      <div class="biz12" style="margin-top:6px">
+        <!-- col1 事務・サービス系 -->
+        <div class="bizcol">
+          <div class="bizhd price"><div class="bh-top"><span class="bh-ic">📄</span><span class="pill p-blue">価格感応</span></div><div class="bh-nm">事務・サービス系</div><div class="bh-c">平日昼間ピーク／空調主体・計2,800社</div></div>
+          <div class="bizcard" onclick="drill('office',this)"><div class="bc-nm">オフィス・士業事務所</div><div class="bc-r"><span class="bc-c" style="color:var(--text3)">小〜中口</span><span class="bc-n">1,600<small>社</small></span></div></div>
+          <div class="bizcard" onclick="drill('school',this)"><div class="bc-nm">学習塾・教育施設</div><div class="bc-r"><span class="bc-c" style="color:var(--text3)">小〜中口</span><span class="bc-n">720<small>社</small></span></div></div>
+          <div class="bizcard" onclick="drill('fitness',this)"><div class="bc-nm">フィットネス・スポーツ</div><div class="bc-r"><span class="bc-c" style="color:var(--text3)">中口・給湯重い</span><span class="bc-n">480<small>社</small></span></div></div>
+        </div>
+        <!-- col2 商業・飲食系 -->
+        <div class="bizcol">
+          <div class="bizhd price"><div class="bh-top"><span class="bh-ic">🏪</span><span class="pill p-blue">価格感応</span></div><div class="bh-nm">商業・飲食系</div><div class="bh-c">営業時間連動／夕方ピーク・計5,000社</div></div>
+          <div class="bizcard" onclick="drill('food',this)"><div class="bc-nm">飲食店（路面店）</div><div class="bc-r"><span class="bc-c" style="color:var(--text3)">小口・最多</span><span class="bc-n">3,200<small>社</small></span></div></div>
+          <div class="bizcard" onclick="drill('retail',this)"><div class="bc-nm">物販・小売店舗</div><div class="bc-r"><span class="bc-c" style="color:var(--text3)">小〜中口</span><span class="bc-n">1,300<small>社</small></span></div></div>
+          <div class="bizcard" onclick="drill('chain',this)"><div class="bc-nm">チェーン本部系列店</div><div class="bc-r"><span class="bc-c" style="color:var(--text3)">本部一括</span><span class="bc-n">500<small>社</small></span></div></div>
+        </div>
+        <!-- col3 製造・物流系 -->
+        <div class="bizcol">
+          <div class="bizhd value"><div class="bh-top"><span class="bh-ic">🏭</span><span class="pill p-red">価値訴求</span></div><div class="bh-nm">製造・物流系</div><div class="bh-c">昼間稼働／冷凍は高負荷・計3,820社</div></div>
+          <div class="bizcard" onclick="drill('factory',this)"><div class="bc-nm">中小工場・町工場</div><div class="bc-r"><span class="bc-c" style="color:var(--primary)">中口・省エネ余地大</span><span class="bc-n">2,100<small>社</small></span></div></div>
+          <div class="bizcard" onclick="drill('cold',this)"><div class="bc-nm">冷蔵冷凍倉庫</div><div class="bc-r"><span class="bc-c" style="color:var(--primary)">中口・高負荷</span><span class="bc-n">980<small>社</small></span></div></div>
+          <div class="bizcard" onclick="drill('warehouse',this)"><div class="bc-nm">常温倉庫・物流</div><div class="bc-r"><span class="bc-c" style="color:var(--primary)">中口</span><span class="bc-n">740<small>社</small></span></div></div>
+        </div>
+        <!-- col4 施設・公共系 -->
+        <div class="bizcol">
+          <div class="bizhd value"><div class="bh-top"><span class="bh-ic">🏥</span><span class="pill p-red">価値訴求</span></div><div class="bh-nm">施設・公共系</div><div class="bh-c">24時間安定／BCP重視・計3,380社</div></div>
+          <div class="bizcard" onclick="drill('medical',this)"><div class="bc-nm">医療（病院・診療所）</div><div class="bc-r"><span class="bc-c" style="color:var(--primary)">中口・高LTV</span><span class="bc-n">1,480<small>社</small></span></div></div>
+          <div class="bizcard" onclick="drill('care',this)"><div class="bc-nm">介護・福祉施設</div><div class="bc-r"><span class="bc-c" style="color:var(--primary)">中口・薄利</span><span class="bc-n">1,180<small>社</small></span></div></div>
+          <div class="bizcard" onclick="drill('hotel',this)"><div class="bc-nm">宿泊（ホテル・旅館）</div><div class="bc-r"><span class="bc-c" style="color:var(--primary)">中口・季節変動</span><span class="bc-n">720<small>社</small></span></div></div>
+        </div>
+      </div>
+      <div class="note" style="margin-top:12px"><b>MECEの担保：</b>「電力の使われ方（負荷の素性）」を一次軸に据えることで、どの需要家も必ず一つの業態に属し重複しない。業種コードの細かさに引きずられず、営業の打ち手が変わる単位で切っている。</div>
+    </div>
+
+    <!-- 最小単位への分解（粒度2→3）ドリルダウン -->
+    <div class="card" style="margin-bottom:12px;border-color:var(--primary-l2)">
+      <div class="card-hd"><span id="drill-title">最小単位への分解（粒度2）── 上の業態を選択してください</span>
+        <span class="badge" style="background:var(--primary);color:#fff">粒度2→3 ｜ 12業態 → 60最小単位 → 180打ち手</span></div>
+      <div id="drill-body" class="g2">
+        <div><h4 class="sec" id="drill-lv2-title">60最小単位（粒度2）｜対象社数</h4><div id="drill-units"></div></div>
+        <div><h4 class="sec" id="drill-lv3-title">180打ち手単位（粒度3）｜対象社数</h4><div id="drill-branches"></div></div>
+      </div>
+      <div class="note" style="margin-top:12px">各最小単位はさらに「客単価帯・機能・温度帯・運用形態」で3分岐し、<b>180の打ち手単位（粒度3）</b>まで割り切れる（※3分岐は「規模」ではなく打ち手が変わる軸で設定）。営業判断に効く粒度で対象社数を積み上げる。</div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd">⚑ 優先対応すべき顧客セグメント<span class="sub">離反リスク・LTV・反応確率から算出したAI優先度</span></div>
+      <div class="g4">
+        <div class="segcard"><div class="st" style="background:var(--red)"></div>
+          <div class="snm"><span class="pill p-red">最優先</span>商業・飲食 × 小口下</div>
+          <div class="sdesc">薄利で新電力の最大標的。契約後ほぼ音信不通で離反寸前。料金最適化をAIで量産し先回り。</div>
+          <div class="srow"><span>社数</span><b>3,200社</b></div><div class="srow"><span>平均離反確率</span><b style="color:var(--red)">58%</b></div><div class="srow"><span>作戦</span><b>価格感応｜量で刈る</b></div>
+        </div>
+        <div class="segcard"><div class="st" style="background:var(--primary)"></div>
+          <div class="snm"><span class="pill p-red">高LTV</span>製造・物流 × 中口上</div>
+          <div class="sdesc">省エネ余地・GX/BCPニーズ大。負荷曲線から訴求先を抽出し営業が深掘り、高LTVで固定化。</div>
+          <div class="srow"><span>社数</span><b>1,150社</b></div><div class="srow"><span>ロイヤル化余地</span><b style="color:var(--green)">高</b></div><div class="srow"><span>作戦</span><b>価値訴求｜質で固める</b></div>
+        </div>
+        <div class="segcard"><div class="st" style="background:var(--teal)"></div>
+          <div class="snm"><span class="pill p-blue">安定高LTV</span>医療・介護 × 中口</div>
+          <div class="sdesc">24時間安定稼働・BCP重視。高LTVだが薄利先も。脱炭素/BCP提案テンプレで関係を固める。</div>
+          <div class="srow"><span>社数</span><b>1,480社</b></div><div class="srow"><span>平均離反確率</span><b style="color:var(--amber)">31%</b></div><div class="srow"><span>作戦</span><b>価値訴求｜質で固める</b></div>
+        </div>
+        <div class="segcard"><div class="st" style="background:var(--amber)"></div>
+          <div class="snm"><span class="pill p-amber">監視</span>オフィス・教育 × 小口</div>
+          <div class="sdesc">平日昼間ピーク。更新期トリガーでデジタル接点。ISで効率捕捉し、足を使わず維持する。</div>
+          <div class="srow"><span>社数</span><b>2,600社</b></div><div class="srow"><span>平均離反確率</span><b style="color:var(--amber)">42%</b></div><div class="srow"><span>作戦</span><b>価格感応｜量で刈る</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 2 : PERSONA / CLUSTER ============ -->
+  <section id="p2" class="page-section">
+    <div class="breadcrumb">TEPCO 法人AIマーケットツイン <span>›</span> <span class="cur">AIペルソナ／クラスタ一覧</span></div>
+    <div class="page-header">
+      <div class="ph-left"><div class="ph-num">2</div>
+        <div><div class="ph-title">AIペルソナ／AIデプスインタビュー ── 60業態を選ぶと顧客解像度が高まる</div>
+        <div class="ph-sub">Market Overviewの60最小単位を選択すると、6つの保有項目でペルソナが解像し、AIにデプスインタビューできる</div></div>
+      </div>
+      <div class="ph-tag">6つの問い × 4調達ルート</div>
+    </div>
+
+    <div class="ai-bar"><span class="aic">✦</span><span><b>使い方：</b>下のプルダウンで<b>60業態（最小単位）</b>を選ぶと、その典型ペルソナが <b>①基本属性〜⑥競合・市場文脈</b> の6項目で解像します。右のチャットで<b>そのペルソナ本人に質問</b>し、営業仮説を深掘りできます。</span></div>
+
+    <!-- selector -->
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:5px;letter-spacing:.04em">業態を選択（Market Overviewの60最小単位）</div>
+      <select id="pers-select" class="selctl" style="min-width:min(520px,100%)" onchange="onPersonaSelect()"></select>
+    </div>
+
+    <div class="g21">
+      <!-- LEFT: persona profile (6 fields) -->
+      <div class="card">
+        <div class="card-hd"><span id="pers-title">ペルソナ・プロファイル</span><span id="pers-badges"></span></div>
+        <div class="g2" style="margin-bottom:12px;gap:12px">
+          <div id="pers-profile"></div>
+          <div>
+            <h4 class="sec">電力の使われ方（負荷曲線）</h4>
+            <div class="chart-wrap" style="height:140px"><canvas id="c_pers_load"></canvas></div>
+            <div class="note" id="pers-loadnote" style="margin-top:8px"></div>
+          </div>
+        </div>
+        <div class="g2" style="gap:12px;margin-bottom:0">
+          <div><h4 class="sec" style="color:var(--red)">離反しやすい / 注視ポイント</h4><div class="note" id="pers-churn" style="line-height:1.9"></div></div>
+          <div><h4 class="sec" style="color:var(--green)">刺さる打ち手</h4><div class="note" id="pers-plays" style="line-height:1.9"></div></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: AI depth interview -->
+      <div class="card" style="display:flex;flex-direction:column">
+        <div class="card-hd">🎙 AIデプスインタビュー<span class="badge" style="background:var(--primary);color:#fff">ペルソナ本人に質問</span></div>
+        <div class="ivlog" id="iv-log"></div>
+        <div style="font-size:10px;color:var(--text3);margin-top:10px;font-weight:600">6つの問いで質問（クリック）</div>
+        <div class="ivchips" id="iv-chips">
+          <div class="ivchip" onclick="askIV(1)">① 基本属性</div>
+          <div class="ivchip" onclick="askIV(2)">② 電力の使われ方</div>
+          <div class="ivchip" onclick="askIV(3)">③ 契約・取引状況</div>
+          <div class="ivchip" onclick="askIV(4)">④ 経営課題・ニーズ</div>
+          <div class="ivchip" onclick="askIV(5)">⑤ 意思決定の構造</div>
+          <div class="ivchip" onclick="askIV(6)">⑥ 競合・市場文脈</div>
+        </div>
+        <div class="ivinput">
+          <input id="iv-input" placeholder="自由に質問を入力…（例：値上げしたら替えますか？）">
+          <button onclick="askFree()">質問する</button>
+          <button onclick="autoIV()" style="background:var(--navy)">全問オート</button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============ PAGE 3 : COMPANY DETAIL ============ -->
+  <section id="p3" class="page-section">
+    <div class="breadcrumb">TEPCO 法人AIマーケットツイン <span>›</span> 優先対応リスト <span>›</span> <span class="cur">個社詳細カルテ</span></div>
+    <div class="page-header">
+      <div class="ph-left"><div class="ph-num">4</div>
+        <div><div class="ph-title">A社（製造業）── 個社詳細カルテ</div>
+        <div class="ph-sub">1社ごとの攻略方針。属性・契約・営業履歴とAI推定を統合し、明日の一手まで落とす</div></div>
+      </div>
+      <div class="ph-tag" style="background:var(--green-l);color:var(--green)">GX先進型 / 価値訴求ゾーン</div>
+    </div>
+
+    <div class="ai-bar"><span class="aic">✦</span><span><b>AI推論：</b>直近3か月で日中負荷が微増、更新期まで残り<b>3か月</b>。<b>離反確率は12%と低い</b>が、競合の再エネ提案接触が確認されており、先回りでロイヤル化を固めるべき。</span></div>
+
+    <!-- ペルソナ分類パス -->
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+          <span style="font-size:11px;font-weight:700;color:var(--text2);margin-right:2px">ペルソナ分類</span>
+          <span class="fstep">4束｜製造・物流系</span><span class="far">▸</span>
+          <span class="fstep">12業態｜中小工場・町工場</span><span class="far">▸</span>
+          <span class="fstep on">60最小単位｜食品製造</span>
+          <span class="pill p-red" style="margin-left:4px">需要規模：中口上</span>
+          <span class="pill p-red">価値訴求</span>
+          <span class="pill p-green">GX先進型</span>
+        </div>
+        <button class="tn-btn" onclick="CURPK={key:'factory',idx:1};showPage('p5',document.querySelector('.tn-step[data-page=p5]'))" style="padding:8px 14px">このペルソナの営業アクション ▶</button>
+      </div>
+      <div class="note" style="margin-top:9px">Market Overviewのマトリクスでは <b>「工場他 × 中口上」</b> セル（価値訴求ゾーン）に該当。同一ペルソナの負荷曲線・勝ちパターン・打ち手が自動適用される。</div>
+    </div>
+
+    <div class="g4">
+      <div class="card"><div class="card-hd">企業属性</div><div class="dl">
+        <div class="dr"><span class="dk">企業名</span><span class="dv">A社（製造業・食品製造）</span></div>
+        <div class="dr"><span class="dk">業種業態</span><span class="dv">製造・物流系</span></div>
+        <div class="dr"><span class="dk">従業員規模</span><span class="dv">180名</span></div>
+        <div class="dr"><span class="dk">契約電力</span><span class="dv">高圧 480kW（中口上）</span></div>
+        <div class="dr"><span class="dk">所在地</span><span class="dv">神奈川県川崎市</span></div>
+        <div class="dr"><span class="dk">担当営業</span><span class="dv">佐藤（法人第2）</span></div>
+      </div></div>
+      <div class="card"><div class="card-hd">契約情報</div><div class="dl">
+        <div class="dr"><span class="dk">契約メニュー</span><span class="dv">高圧・標準メニュー</span></div>
+        <div class="dr"><span class="dk">年間使用量</span><span class="dv mono">2,180 MWh</span></div>
+        <div class="dr"><span class="dk">年間電気代</span><span class="dv mono">約 6,400万円</span></div>
+        <div class="dr"><span class="dk">更新期</span><span class="dv" style="color:var(--amber)">3か月後（9月）</span></div>
+        <div class="dr"><span class="dk">導入済</span><span class="dv">なし</span></div>
+        <div class="dr"><span class="dk">相談履歴</span><span class="dv">省エネ相談あり</span></div>
+      </div></div>
+      <div class="card"><div class="card-hd">営業・商談履歴</div><div class="dl">
+        <div class="dr"><span class="dk">訪問頻度</span><span class="dv">四半期1回</span></div>
+        <div class="dr"><span class="dk">直近接触</span><span class="dv">42日前</span></div>
+        <div class="dr"><span class="dk">過去受注</span><span class="dv">高圧切替（2022）</span></div>
+        <div class="dr"><span class="dk">失注理由</span><span class="dv">蓄電池：投資判断保留</span></div>
+        <div class="dr"><span class="dk">問合せ</span><span class="dv">省エネ・PPAの可否</span></div>
+        <div class="dr"><span class="dk">競合接触</span><span class="dv" style="color:var(--red)">新電力/再エネ 有</span></div>
+      </div></div>
+      <div class="card" style="display:flex;flex-direction:column">
+        <div class="card-hd">AI推定サマリ</div>
+        <div class="gauge" id="g_loyal" style="background:conic-gradient(var(--green) 0% 82%, var(--bg2) 82% 100%)">
+          <div class="ginner"><div class="gv" style="color:var(--green)">82</div><div class="gl">ロイヤリティ</div></div>
+        </div>
+        <div class="g2" style="margin:14px 0 0;gap:8px">
+          <div style="text-align:center;background:var(--red-l);border-radius:8px;padding:9px"><div class="mono" style="font-size:22px;font-weight:900;color:var(--red)">12%</div><div style="font-size:9.5px;color:var(--text2)">離反確率</div></div>
+          <div style="text-align:center;background:var(--green-l);border-radius:8px;padding:9px"><div class="mono" style="font-size:22px;font-weight:900;color:var(--green)">高</div><div style="font-size:9.5px;color:var(--text2)">拡大余地</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g21">
+      <div class="card">
+        <div class="g2" style="margin-bottom:0;gap:18px">
+          <div>
+            <div class="card-hd">🕘 過去の営業履歴<span class="sub">接触・商談ログ</span></div>
+            <div class="tl">
+              <div class="ti win"><div class="td">2022/04</div><div class="tt">高圧メニュー切替 ── 受注</div><div class="tx">担当:佐藤。競合比較の末に獲得。</div></div>
+              <div class="ti"><div class="td">2023/06</div><div class="tt">省エネ相談 受付</div><div class="tx">工場の日中コスト増について相談。診断は未実施のまま。</div></div>
+              <div class="ti loss"><div class="td">2024/02</div><div class="tt">蓄電池提案 ── 失注</div><div class="tx">失注理由：投資判断が保留（投資回収の見通しが不明だった）。</div></div>
+              <div class="ti"><div class="td">2025/11</div><div class="tt">省エネ・PPAの可否 問合せ（顕在ニーズ）</div><div class="tx">取引先からの脱炭素要請が背景。回答フォロー未完。</div></div>
+              <div class="ti"><div class="td">2026/05（42日前）</div><div class="tt">定期訪問</div><div class="tx">近況ヒアリングのみ。次アクション未設定のまま経過。</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="card-hd">✅ 営業アクション実施有無<span class="sub">⑤6支援の実施状況</span></div>
+            <div class="actck"><span class="ck done">✓</span><div class="an">① ターゲティング支援</div><span class="ax">実施済（今週当てる先に掲載）</span></div>
+            <div class="actck"><span class="ck done">✓</span><div class="an">② 提案コンテンツ生成</div><span class="ax">実施済（省エネ診断提案書 生成）</span></div>
+            <div class="actck"><span class="ck no">–</span><div class="an">③ トーク・FAQ支援</div><span class="ax" style="color:var(--red)">未実施</span></div>
+            <div class="actck"><span class="ck done">✓</span><div class="an">④ タイミング支援</div><span class="ax">実施済（更新期3か月前アラート発火）</span></div>
+            <div class="actck"><span class="ck done">✓</span><div class="an">⑤ チャネル振り分け</div><span class="ax">実施済（フィールド営業に割当）</span></div>
+            <div class="actck"><span class="ck mid">…</span><div class="an">⑥ ナレッジ循環</div><span class="ax">商談中（クローズ後に反映）</span></div>
+            <div class="note" style="margin-top:10px"><b>未実施：③トーク・FAQ支援</b> → スクリプト生成で商談準備を補完。前回の失注（蓄電池：投資判断保留）を踏まえ、投資回収を明確化した切り口が有効。</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd">負荷曲線（平日）<span class="sub">昼間稼働の台形型</span></div>
+        <div class="chart-wrap" style="height:150px"><canvas id="c_load_a"></canvas></div>
+        <div style="margin-top:12px"><h4 class="sec">推奨ネクストアクション</h4>
+          <div class="trigger"><div class="tic" style="background:var(--green-l)">📋</div><div><div style="font-weight:700;font-size:11.5px">省エネ診断アポ（更新期3か月前）</div><div class="note">削減効果の試算とセットで訪問。担当:佐藤 / 次回接触 7月10日</div></div></div>
+        </div>
+        <button class="tn-btn" style="width:100%;margin-top:6px;padding:9px" onclick="showPage('p5',document.querySelector('[data-page=p5]'))">▶ 推奨アクションを見る</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 4 : GIS MAP ============ -->
+  <section id="p4" class="page-section">
+    <div class="breadcrumb">TEPCO 法人AIマーケットツイン <span>›</span> <span class="cur">GIS／エリアマップ</span></div>
+    <div class="page-header">
+      <div class="ph-left"><div class="ph-num">3</div>
+        <div><div class="ph-title">GIS／エリアマップ ── 営業エリア戦略に落とす</div>
+        <div class="ph-sub">どのエリアに・どのペルソナが・どれだけいるか。担当割り当てと巡回ルート設計につなげる</div></div>
+      </div>
+      <div class="ph-tag">国土地理院 地図 / 供給地点特定番号ベース</div>
+    </div>
+
+    <div class="ai-bar"><span class="aic">✦</span><span><b>空白地の発見：</b><b>川崎・横浜臨海部</b>は製造中口の需要密度が高いが顧客が薄い<b>優先開拓地</b>。<b>新宿・渋谷</b>は飲食小口の離反リスクが密集。ピンをクリックで個社の離反確率・推奨アクションを表示。担当エリア×ペルソナで巡回を再設計。</span></div>
+
+    <!-- 3-step framing（住所を座標に変え、ペルソナを地図に載せ、営業判断につなぐ） -->
+    <div class="g3" style="margin-bottom:12px">
+      <div class="card" style="padding:12px 14px"><div style="font-size:12px;font-weight:700"><span style="color:var(--navy)">①</span> 位置の特定 <span class="note" style="font-weight:400">ジオコーディング</span></div><div class="note" style="margin-top:5px">住所→座標化（国土地理院／地図API）。<b>供給地点特定番号（22桁）</b>で高精度特定 ★強み／スマメ位置と突合</div></div>
+      <div class="card" style="padding:12px 14px"><div style="font-size:12px;font-weight:700"><span style="color:var(--navy)">②</span> 可視化レイヤー <span class="note" style="font-weight:400">地図表現</span></div><div class="note" style="margin-top:5px">点：1社1ピン（ペルソナ色分け・離反予兆強調）／面：需要ヒートマップ／外部レイヤー重畳で<b>空白地を発見 ★</b></div></div>
+      <div class="card" style="padding:12px 14px"><div style="font-size:12px;font-weight:700"><span style="color:var(--primary)">③</span> 営業判断 <span class="note" style="font-weight:400">地図で動く</span></div><div class="note" style="margin-top:5px"><b>担当割り当て</b>（エリア×ペルソナ）／<b>巡回ルート最適化</b>／<b>空白地帯の発見</b>で優先開拓</div></div>
+    </div>
+
+    <div class="g31">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="map-wrap">
+          <div id="gsi-map" style="width:100%;height:100%"></div>
+          <div class="map-legend">
+            <div style="font-size:10px;font-weight:700;margin-bottom:2px;color:var(--text)">色＝ペルソナ業態</div>
+            <div class="lgi"><span class="lgd" style="background:var(--blue)"></span>オフィス・事務（価格感応）</div>
+            <div class="lgi"><span class="lgd" style="background:var(--amber)"></span>商業・飲食（価格感応）</div>
+            <div class="lgi"><span class="lgd" style="background:var(--primary)"></span>製造・物流（価値訴求）</div>
+            <div class="lgi"><span class="lgd" style="background:var(--teal)"></span>施設・公共/医療（価値訴求）</div>
+            <div class="lgi" style="margin-top:4px;border-top:1px dashed var(--border);padding-top:5px"><span class="lgd" style="width:14px;height:14px;background:var(--red)"></span><b>大きい赤＝離反リスク高</b>（≥55%）</div>
+            <div class="lgi" style="font-size:9.5px;color:var(--text3)">面の濃淡＝需要密度ヒートマップ</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-hd">ピンの見方（色分けルール）<span class="sub">クリックで個社情報</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div class="barrow"><span style="width:13px;height:13px;border-radius:50%;background:var(--blue);border:1.5px solid #fff;box-shadow:0 0 0 1px var(--border);flex-shrink:0"></span><span style="font-size:11px">オフィス・事務 <span class="pill p-blue" style="margin-left:2px">価格感応</span></span></div>
+            <div class="barrow"><span style="width:13px;height:13px;border-radius:50%;background:var(--amber);border:1.5px solid #fff;box-shadow:0 0 0 1px var(--border);flex-shrink:0"></span><span style="font-size:11px">商業・飲食 <span class="pill p-blue" style="margin-left:2px">価格感応</span></span></div>
+            <div class="barrow"><span style="width:13px;height:13px;border-radius:50%;background:var(--primary);border:1.5px solid #fff;box-shadow:0 0 0 1px var(--border);flex-shrink:0"></span><span style="font-size:11px">製造・物流 <span class="pill p-red" style="margin-left:2px">価値訴求</span></span></div>
+            <div class="barrow"><span style="width:13px;height:13px;border-radius:50%;background:var(--teal);border:1.5px solid #fff;box-shadow:0 0 0 1px var(--border);flex-shrink:0"></span><span style="font-size:11px">施設・公共/医療 <span class="pill p-red" style="margin-left:2px">価値訴求</span></span></div>
+            <div class="barrow" style="border-top:1px dashed var(--border);padding-top:7px;margin-top:1px"><span style="width:18px;height:18px;border-radius:50%;background:var(--red);border:1.5px solid #fff;box-shadow:0 0 0 1px var(--border);flex-shrink:0"></span><span style="font-size:11px"><b style="color:var(--red)">大きい赤ピン</b>＝離反確率 <b>55%以上</b></span></div>
+          </div>
+          <div class="note" style="margin-top:9px"><b>色＝ペルソナ業態</b>（価格感応/価値訴求）、<b>サイズ・赤＝離反リスク</b>、<b>面の濃淡＝需要密度</b>。ピンをクリックで離反確率・推奨アクションを表示。</div>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-hd">表示レイヤー<span class="sub">トグルで地図に反映</span></div>
+          <div class="layer-toggle"><span>顧客ピンプロット</span><span class="tog on" data-layer="pins" onclick="toggleLayer('pins',this)"></span></div>
+          <div class="layer-toggle"><span>離反リスク強調</span><span class="tog on" data-layer="risk" onclick="toggleLayer('risk',this)"></span></div>
+          <div class="layer-toggle"><span>需要ヒートマップ</span><span class="tog on" data-layer="heat" onclick="toggleLayer('heat',this)"></span></div>
+          <div class="layer-toggle"><span>担当営業エリア</span><span class="tog on" data-layer="area" onclick="toggleLayer('area',this)"></span></div>
+          <div class="layer-toggle"><span>商業集積レイヤー</span><span class="tog"></span></div>
+          <div class="layer-toggle"><span>競合圏レイヤー</span><span class="tog"></span></div>
+          <div class="layer-toggle"><span>人口密度レイヤー</span><span class="tog"></span></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">エリア別サマリ<span class="sub">担当割り当て</span></div>
+          <table><thead><tr><th>エリア</th><th>社数</th><th>離反高</th><th>担当</th></tr></thead><tbody>
+            <tr><td class="t-name">東京23区</td><td class="mono">5,240</td><td><span class="pill p-red">720</span></td><td>佐藤(4)</td></tr>
+            <tr><td class="t-name">川崎・横浜</td><td class="mono">3,180</td><td><span class="pill p-amber">340</span></td><td>鈴木(3)</td></tr>
+            <tr><td class="t-name">多摩・武蔵野</td><td class="mono">2,410</td><td><span class="pill p-amber">280</span></td><td>田中(2)</td></tr>
+            <tr><td class="t-name">千葉ベイ</td><td class="mono">1,870</td><td><span class="pill p-red">190</span></td><td>高橋(2)</td></tr>
+            <tr><td class="t-name">埼玉南部</td><td class="mono">2,300</td><td><span class="pill p-amber">110</span></td><td>伊藤(1)</td></tr>
+          </tbody></table>
+          <div class="note" style="margin-top:10px">既存顧客データに「座標」と「ペルソナ」の2列を足すだけで地図/BIに載る。新規構築より軽く、早い。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ 営業判断：営業割り当て方針 -->
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-hd">🧭 営業割り当て方針 ── エリア × ペルソナ × 離反リスクで配分<span class="sub">二正面作戦で人的リソースを最適化</span></div>
+      <div class="two-front">
+        <div class="tf price"><div class="tf-h">⚡ 価格感応ゾーン｜量で刈る（IS/AI中心）</div><ul>
+          <li>飲食小口・オフィス小口など＝<b>フィールド営業を割り当てない</b></li>
+          <li>離反予兆スコアの高い順に<b>メール/SMS/IS・AI自動提案</b>で捕捉</li>
+          <li>例：新宿・渋谷の飲食小口の離反密集ゾーンを自動接触</li></ul></div>
+        <div class="tf value"><div class="tf-h">🎯 価値訴求ゾーン｜質で固める（フィールド営業）</div><ul>
+          <li>製造・医療・倉庫の中口＝<b>担当営業が対面で深掘り</b></li>
+          <li>省エネ余地・BCPニーズの高い順に担当へ割り当て</li>
+          <li>例：川崎・横浜臨海の製造中口を鈴木チームが専任担当</li></ul></div>
+      </div>
+      <div class="note" style="margin-top:10px">解約予兆の検知 → 流出前の先回り接触までを一気通貫で回し、<b>営業の足を価値訴求ゾーンへ再配置</b>する。担当割り当ては「エリア×ペルソナ」で自動マッピング。</div>
+    </div>
+
+    <div class="g3">
+      <div class="card"><div class="card-hd">🧭 担当割り当て<span class="sub">エリア × ペルソナ</span></div>
+        <div class="note" style="line-height:1.8">エリアとペルソナの組合せで、誰がどこを持つかを最適化。<br>例：<b>川崎・横浜の製造中口＝鈴木チーム（価値訴求で深掘り）</b>／新宿・渋谷の飲食小口＝<b>IS/AIで自動捕捉（価格感応）</b>。フィールド営業の足を価値訴求ゾーンへ再配置。</div></div>
+      <div class="card"><div class="card-hd">🚗 巡回ルート最適化<span class="sub">中口の価値訴求先を束ねる</span></div>
+        <div class="note" style="line-height:1.8">地理的に近い高LTV先をまとめて1日で巡回。<br>例：<b>川崎臨海の製造・冷凍倉庫8社</b>を最短ルートで訪問。更新期・離反予兆の近い順に自動並べ替え。</div></div>
+      <div class="card"><div class="card-hd">⚑ 空白地帯の発見<span class="sub">優先開拓地</span></div>
+        <div class="note" style="line-height:1.8">需要密度は高いが顧客が薄いゾーンを抽出。<br>例：<b>川崎・横浜臨海部（製造中口）</b>、<b>幕張・千葉ベイ（物流）</b>。ヒートマップ濃×ピン薄の差分で機械的に検出。</div></div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 5 : RECOMMENDED ACTION ============ -->
+  <section id="p5" class="page-section">
+    <div class="breadcrumb">TEPCO 法人AIマーケットツイン <span>›</span> 個社詳細（A社） <span>›</span> <span class="cur">営業アクション推奨</span></div>
+    <div class="page-header">
+      <div class="ph-left"><div class="ph-num">5</div>
+        <div><div class="ph-title">営業アクション推奨 ── 6つの支援をAIペルソナから供給</div>
+        <div class="ph-sub">AIペルソナを選ぶと、営業活動の流れに沿った6つの支援の具体レコメンドを表示。トークはワンクリックで生成へ</div></div>
+      </div>
+      <div class="ph-tag" id="p5-tag">ペルソナ選択で更新</div>
+    </div>
+
+    <div class="ai-bar"><span class="aic">✦</span><span id="p5-ai"></span></div>
+
+    <!-- persona selector -->
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:5px;letter-spacing:.04em">AIペルソナを選択（Market Overviewの60最小単位）</div>
+      <select id="sup-select" class="selctl" style="min-width:min(520px,100%)" onchange="onSupSelect()"></select>
+    </div>
+
+    <!-- 6-support tabs（選択すると各アクションの詳細を表示） -->
+    <div class="note" style="margin-bottom:6px;font-weight:600;color:var(--text2)">営業活動の流れに沿った6つの支援。タブを選択すると具体的なアクション内容が表示されます。</div>
+    <div class="talk-tabs" id="sup-tabs" style="margin-bottom:12px">
+      <div class="talk-tab active" onclick="showSupTab(0,this)">📋 まとめ</div>
+      <div class="talk-tab" onclick="showSupTab(1,this)">① ターゲティング</div>
+      <div class="talk-tab" onclick="showSupTab(2,this)">② 提案コンテンツ</div>
+      <div class="talk-tab" onclick="showSupTab(3,this)">③ トーク・FAQ</div>
+      <div class="talk-tab" onclick="showSupTab(4,this)">④ タイミング</div>
+      <div class="talk-tab" onclick="showSupTab(5,this)">⑤ チャネル振り分け</div>
+      <div class="talk-tab" onclick="showSupTab(6,this)">⑥ ナレッジ循環</div>
+    </div>
+    <div id="sup-content"></div>
+  </section>
+
+  <!-- ============ PAGE 6 : TALK GENERATION ============ -->
+  <section id="p6" class="page-section">
+    <div class="breadcrumb">TEPCO 法人AIマーケットツイン <span>›</span> 推奨アクション <span>›</span> <span class="cur">営業トーク生成</span></div>
+    <div class="page-header">
+      <div class="ph-left"><div class="ph-num">6</div>
+        <div><div class="ph-title">営業トーク生成 ── そのまま使えるトークを出力</div>
+        <div class="ph-sub">選択したAIペルソナ×提案テーマ×チャネルから、訪問・メール・架電・提案書骨子を自動生成</div></div>
+      </div>
+      <div class="ph-tag">生成AI / 勝ちパターン学習</div>
+    </div>
+
+    <div class="talk-meta" id="talk-meta" style="margin:0 0 14px"></div>
+
+    <div class="talk-tabs">
+      <div class="talk-tab active" onclick="showTalk('t1',this)">🚶 訪問用トーク</div>
+      <div class="talk-tab" onclick="showTalk('t2',this)">✉ メール文面</div>
+      <div class="talk-tab" onclick="showTalk('t3',this)">📞 架電スクリプト</div>
+      <div class="talk-tab" onclick="showTalk('t4',this)">📄 提案書の骨子</div>
+    </div>
+
+    <div class="g21">
+      <div class="card">
+        <div id="t1" class="talk-body active"><div class="talk-out" id="tk-visit"></div></div>
+        <div id="t2" class="talk-body"><div class="talk-out" id="tk-mail"></div></div>
+        <div id="t3" class="talk-body"><div class="talk-out" id="tk-call"></div></div>
+        <div id="t4" class="talk-body"><div class="talk-out" id="tk-doc"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-hd">生成の根拠</div>
+        <div class="dl">
+          <div class="dr"><span class="dk">参照した勝ちパターン</span><span class="dv" id="tk-ref">—</span></div>
+          <div class="dr"><span class="dk">競合対抗トーク</span><span class="dv">新電力の値引き 切り返し同梱</span></div>
+          <div class="dr"><span class="dk">受容確率</span><span class="dv" id="tk-acc" style="color:var(--green)">—</span></div>
+          <div class="dr"><span class="dk">推奨CTA</span><span class="dv" id="tk-cta">—</span></div>
+        </div>
+        <h4 class="sec" style="margin-top:14px">出力オプション</h4>
+        <div class="talk-meta">
+          <span class="pill p-navy">クリップボードにコピー</span>
+          <span class="pill p-gray">SFAへ登録</span>
+          <span class="pill p-gray">再生成</span>
+        </div>
+        <div class="note" style="margin-top:14px">成約・失注の結果をペルソナに反映して継続学習。3,000社の優良営業の暗黙知を全営業に展開・標準化する（ナレッジ循環）。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 7 : PRIORITY LIST ============ -->
+  <section id="p7" class="page-section">
+    <div class="breadcrumb">TEPCO 法人AIマーケットツイン <span>›</span> <span class="cur">優先対応リスト</span></div>
+    <div class="page-header">
+      <div class="ph-left"><div class="ph-num">7</div>
+        <div><div class="ph-title">優先対応リスト ── 12,000社を実行に落とす</div>
+        <div class="ph-sub">離反確率・LTV・反応確率でスコアリングし「今週当てる先」を配信。二正面作戦で管理</div></div>
+      </div>
+      <div class="ph-tag">未ケア 12,000社 / 週次更新</div>
+    </div>
+
+    <div class="two-front" style="margin-bottom:14px">
+      <div class="tf price"><div class="tf-h">⚡ 価格感応ゾーン｜量で刈り取る <span class="pill p-blue" style="margin-left:auto">7,800社</span></div>
+        <ul><li>AIが料金最適化提案を標準テンプレで自動量産</li><li>解約予兆スコアの高い順にデジタル接点／ISで接触</li><li>フィールド営業の足は使わず、仕組みで捕捉</li></ul></div>
+      <div class="tf value"><div class="tf-h">🎯 価値訴求ゾーン｜質で固める <span class="pill p-red" style="margin-left:auto">7,200社</span></div>
+        <ul><li>負荷曲線から省エネ余地・BCPニーズの高い先を抽出</li><li>業種別の脱炭素・BCP提案テンプレを営業に供給</li><li>営業がピンポイントで深掘り、高LTVで固定化</li></ul></div>
+    </div>
+
+    <!-- persona selector -->
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap">
+        <div style="flex:1;min-width:280px">
+          <div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:5px;letter-spacing:.04em">ペルソナ分類で絞り込み（60最小単位）</div>
+          <select id="pri-select" class="selctl" style="min-width:min(520px,100%)" onchange="onPriSelect()"></select>
+        </div>
+        <div class="note" id="pri-note" style="max-width:340px"></div>
+      </div>
+    </div>
+
+    <div class="chips">
+      <div class="fchip active" onclick="priFilter('all',this)">すべて<span class="fc-n">12,000</span></div>
+      <div class="fchip" onclick="priFilter('price',this)">価格感応<span class="fc-n">7,800</span></div>
+      <div class="fchip" onclick="priFilter('value',this)">価値訴求<span class="fc-n">7,200</span></div>
+      <div class="fchip" onclick="priFilter('churn50',this)">離反確率50%以上<span class="fc-n">1,640</span></div>
+      <div class="fchip" onclick="priFilter('ltv',this)">高LTV<span class="fc-n">4,180</span></div>
+      <div class="fchip" onclick="priFilter('upd',this)">更新期3か月内<span class="fc-n">2,100</span></div>
+      <div class="fchip" onclick="priFilter('week',this)">今週当てる先<span class="fc-n">320</span></div>
+    </div>
+
+    <div class="card" style="padding:6px 8px">
+      <table>
+        <thead><tr>
+          <th>顧客名</th><th>ペルソナ / 需要規模</th><th>離反確率</th><th>ロイヤリティ</th><th>反応確率</th><th>推奨アクション（⑤営業アクション連動）</th><th>担当</th><th>次回接触</th><th>ステータス</th>
+        </tr></thead>
+        <tbody id="pri-tbody"></tbody>
+      </table>
+    </div>
+    <div class="note" style="margin-top:12px;text-align:center">全12,000社を離反確率×LTV×反応確率でスコアリング。共通の仕組み：<b>ペルソナ判定 › 打ち手・提案生成 › 優先度スコアリング › 接点・営業へ配信 › 効果測定で再学習</b></div>
+  </section>
+
+  </main>
+</div>
+
+<script>
+/* ===== PAGE NAV ===== */
+const chartInit = {};
+function showPage(id, el){
+  document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  // sync nav highlight (both top steps & sidebar) by data-page
+  document.querySelectorAll('.tn-step,.sb-item').forEach(n=>{
+    n.classList.toggle('active', n.getAttribute('data-page')===id);
+  });
+  initCharts(id);
+  if(id==='p5'){ populateSupSelect(); setSel('sup-select'); renderSupports(); }
+  if(id==='p6'){ genTalk(); }
+  if(id==='p7'){ populatePriSelect(); const ps=document.getElementById('pri-select'); if(ps.options.length) ps.value=CURPK.key+'|'+CURPK.idx; curPriFilter='all'; document.querySelectorAll('.chips .fchip').forEach((c,x)=>c.classList.toggle('active',x===0)); renderPriority(); }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goPersona(){ showPage('p2', document.querySelector('.tn-step[data-page=p2]')); }
+
+/* ===== 12業態 → 60最小単位 → 180打ち手 ドリルダウン ===== */
+const MODE_COLOR={price:'#0A6EBD',value:'#E60012'};
+const WEIGHTS=[[.45,.33,.22],[.40,.35,.25],[.50,.30,.20],[.38,.34,.28],[.44,.31,.25]];
+function split3(total,i){const w=WEIGHTS[i%5];let a=Math.round(total*w[0]),b=Math.round(total*w[1]),c=total-a-b;if(c<0)c=0;return[a,b,c];}
+const SEG60={
+ office:{name:'オフィス・士業事務所',bundle:'事務・サービス系',mode:'price',total:1600,units:[
+   ['単独テナント',520,['小規模区画','ワンフロア','複数フロア'],'小口下'],['自社ビル',240,['築古・省エネ余地大','築浅・高効率','建替検討中'],'中口下'],
+   ['シェアオフィス',180,['コワーキング','レンタルオフィス','インキュベーション'],'小口下'],['士業・専門事務所',420,['法律・会計','設計・建築','コンサル系'],'小口下'],
+   ['IT・コールセンター',240,['少人数開発','大型センター','24h運用拠点'],'中口下']]},
+ school:{name:'学習塾・教育施設',bundle:'事務・サービス系',mode:'price',total:720,units:[
+   ['進学塾・予備校',210,['集団指導','映像授業','寮併設'],'小口下'],['個別指導',240,['小規模教室','FC展開','オンライン併用'],'小口下'],
+   ['専門学校',90,['医療・福祉系','IT・デザイン系','調理・美容系'],'中口下'],['カルチャー教室',100,['音楽・芸術','語学','資格対策'],'小口下'],
+   ['保育・幼稚園',80,['認可保育','認定こども園','インター系'],'小口下']]},
+ fitness:{name:'フィットネス・スポーツ',bundle:'事務・サービス系',mode:'price',total:480,units:[
+   ['総合ジム',140,['大型クラブ','公共連携','リゾート型'],'中口下'],['24h無人ジム',160,['都心型','郊外ロードサイド','FCチェーン'],'小口下'],
+   ['スイミング',70,['スクール主体','フィットネス併設','公共プール'],'中口下'],['ヨガ・スタジオ',70,['ホットヨガ','常温スタジオ','ピラティス'],'小口下'],
+   ['ゴルフ練習場',40,['大型打席','屋内シミュレーター','インドアスクール'],'中口下']]},
+ food:{name:'飲食店（路面店）',bundle:'商業・飲食系',mode:'price',total:3200,units:[
+   ['居酒屋・バー',820,['大衆居酒屋','ダイニングバー','高級和食'],'小口下'],['カフェ・喫茶',760,['チェーンカフェ','個人喫茶','ベーカリー併設'],'小口下'],
+   ['レストラン',780,['ファミレス','専門料理店','高級店'],'小口下'],['ファストフード',500,['バーガー系','牛丼・定食','テイクアウト主体'],'小口下'],
+   ['深夜営業店',340,['居酒屋深夜','ラーメン','ナイト業態'],'小口下']]},
+ retail:{name:'物販・小売店舗',bundle:'商業・飲食系',mode:'price',total:1300,units:[
+   ['食品スーパー',340,['小型店','標準店','大型・冷蔵強化'],'中口下'],['コンビニ',380,['都心型','郊外型','24h・冷凍強化'],'小口下'],
+   ['ドラッグストア',220,['調剤併設','食品強化','化粧品主体'],'中口下'],['アパレル・雑貨',220,['路面店','SC内','セレクト系'],'小口下'],
+   ['家電・量販',140,['総合量販','専門量販','リユース系'],'中口下']]},
+ chain:{name:'チェーン本部系列店',bundle:'商業・飲食系',mode:'price',total:500,units:[
+   ['FC加盟店',180,['単独オーナー','複数店オーナー','メガFC'],'小口下'],['直営チェーン',140,['小商圏ドミナント','広域展開','都心集中'],'中口下'],
+   ['本部一括契約',90,['数十店規模','数百店規模','全国チェーン'],'中口上'],['複合商業内',60,['モール核店舗','専門店区画','フードコート'],'中口下'],
+   ['百貨店テナント',30,['デパ地下','物販フロア','レストラン街'],'中口下']]},
+ factory:{name:'中小工場・町工場',bundle:'製造・物流系',mode:'value',total:2100,units:[
+   ['金属加工',620,['切削・プレス','溶接・鋳造','表面処理'],'中口下'],['食品製造',520,['常温加工','要冷蔵加工','冷凍食品'],'中口上'],
+   ['印刷・紙器',340,['オフセット','段ボール・紙器','デジタル印刷'],'中口下'],['化学・樹脂',320,['成形・射出','塗料・薬品','ゴム・ガラス'],'中口上'],
+   ['電子部品',300,['クリーンルーム有','組立・実装','検査・試験'],'中口上']]},
+ cold:{name:'冷蔵冷凍倉庫',bundle:'製造・物流系',mode:'value',total:980,units:[
+   ['食品冷凍庫',320,['チルド帯','フローズン帯','超低温帯'],'中口上'],['定温倉庫',240,['医薬定温','食品定温','精密機器'],'中口上'],
+   ['EC物流拠点',200,['常温ピッキング','冷蔵対応','自動化倉庫'],'中口上'],['卸売市場関連',120,['水産加工','青果保冷','食肉処理'],'中口下'],
+   ['コールドチェーン',100,['集配センター','中継拠点','ラスト配送'],'中口上']]},
+ warehouse:{name:'常温倉庫・物流',bundle:'製造・物流系',mode:'value',total:740,units:[
+   ['常温倉庫',220,['保管主体','流通加工併設','危険物対応'],'中口下'],['配送センター',210,['地域DC','通過型TC','宅配仕分'],'中口上'],
+   ['ラストワンマイル',140,['営業所','デポ','宅配ロッカー拠点'],'中口下'],['資材置場',100,['建設資材','車両基地','屋外ヤード'],'小口下'],
+   ['トランクルーム',70,['屋内型','屋外コンテナ','宅配型'],'小口下']]},
+ medical:{name:'医療（病院・診療所）',bundle:'施設・公共系',mode:'value',total:1480,units:[
+   ['有床病院',240,['急性期','慢性期・療養','専門特化'],'中口上'],['無床診療所',520,['内科系','外科・整形','皮膚・眼科等'],'中口下'],
+   ['歯科クリニック',380,['一般歯科','矯正・審美','口腔外科'],'小口下'],['透析・検査',120,['透析専門','画像診断','健診センター'],'中口上'],
+   ['調剤薬局',220,['門前薬局','面分業','在宅対応'],'小口下']]},
+ care:{name:'介護・福祉施設',bundle:'施設・公共系',mode:'value',total:1180,units:[
+   ['特養・老健',280,['特別養護','老人保健','医療療養'],'中口上'],['通所デイ',360,['一般デイ','リハ特化','認知症対応'],'中口下'],
+   ['サ高住',220,['一般型','介護型','高級型'],'中口下'],['グループホーム',180,['認知症GH','障害者GH','小規模多機能'],'小口下'],
+   ['障害福祉',140,['就労支援','生活介護','児童発達'],'小口下']]},
+ hotel:{name:'宿泊（ホテル・旅館）',bundle:'施設・公共系',mode:'value',total:720,units:[
+   ['シティホテル',120,['フルサービス','宴会・MICE強','外資系'],'中口上'],['ビジネスH',240,['駅前型','ロードサイド','宿泊特化チェーン'],'中口上'],
+   ['旅館・温泉',200,['大型温泉','小規模旅館','高級旅館'],'中口下'],['民宿・ペンション',90,['観光地民宿','ペンション','ゲストハウス'],'小口下'],
+   ['宿泊研修所',70,['企業研修所','保養所','公共宿泊施設'],'小口下']]}
+};
+const SIZE_PILL={'中口上':'p-red','中口下':'p-amber','小口下':'p-gray'};
+let curKey=null;
+function drill(key,el){
+  curKey=key; const g=SEG60[key]; const col=MODE_COLOR[g.mode];
+  if(!el) el=[...document.querySelectorAll('.bizcard')].find(c=>(c.getAttribute('onclick')||'').includes("'"+key+"'"));
+  document.querySelectorAll('.bizcard').forEach(c=>c.classList.remove('sel')); if(el) el.classList.add('sel');
+  document.getElementById('drill-title').innerHTML='最小単位への分解｜<b style="color:var(--primary)">'+g.bundle+' › '+g.name+'</b>（計 '+g.total.toLocaleString()+' 社 → 5最小単位）';
+  document.getElementById('drill-lv2-title').innerHTML='60最小単位（粒度2）｜<b>'+g.name+'</b>';
+  const max=Math.max(...g.units.map(u=>u[1]));
+  document.getElementById('drill-units').innerHTML=g.units.map((u,i)=>
+    `<div class="drow" onclick="drillUnit(${i},this)"><span class="dn">${u[0]}</span><span class="pill ${SIZE_PILL[u[3]]}" style="font-size:9px;padding:1px 6px;flex-shrink:0">${u[3]}</span><div class="minibar"><span style="width:${Math.round(u[1]/max*100)}%;background:${col}"></span></div><span class="dc">${u[1].toLocaleString()}</span><span class="darr">▸</span></div>`).join('');
+  document.getElementById('drill-lv3-title').innerHTML='180打ち手単位（粒度3）｜対象社数';
+  document.getElementById('drill-branches').innerHTML='<div class="note" style="padding:22px 10px;text-align:center;border:1px dashed var(--border);border-radius:8px">← 左の<b>最小単位</b>を選択すると、3つの<b>打ち手単位（粒度3）</b>ごとの対象社数に分解されます</div>';
+}
+function drillUnit(i,el){
+  const g=SEG60[curKey]; const u=g.units[i]; const col=MODE_COLOR[g.mode];
+  document.querySelectorAll('#drill-units .drow').forEach(r=>r.classList.remove('sel')); el.classList.add('sel');
+  const parts=split3(u[1],i); const max=Math.max(...parts,1);
+  document.getElementById('drill-lv3-title').innerHTML='180打ち手単位（粒度3）｜<b style="color:var(--primary)">'+u[0]+'</b>（3分岐 → 計 '+u[1].toLocaleString()+' 社）';
+  document.getElementById('drill-branches').innerHTML=u[2].map((bn,k)=>
+    `<div class="brow"><span class="bn">${bn}</span><div class="minibar"><span style="width:${Math.round(parts[k]/max*100)}%;background:${col}"></span></div><span class="bc">${parts[k].toLocaleString()}</span></div>`).join('');
+}
+
+/* ===== AIペルソナ / AIデプスインタビュー ===== */
+const IV_Q={1:'御社の事業規模と電力契約について教えてください。',2:'電気は主にどのように使われていますか？（負荷の特徴）',3:'いまの電力契約や更新時期、これまでの取引状況は？',4:'いま経営で困っていること・優先課題は何ですか？',5:'電力の切替や設備投資は、誰がどう決めますか？',6:'他社（新電力など）からの営業や、乗り換えの検討状況は？'};
+const PERSONA={
+ office:{cluster:'現状維持型',mode:'price',res:84,kw:'30–100kW（小口〜中口下）',size:'10–80名',yen:'150–600万円',loc:'東京23区',
+  load:[8,70,82,78,45,15,6],loadnote:'平日日中ピーク・空調主体。夜間休日は低負荷。',
+  f3:'低圧〜高圧の標準メニュー。更新期は分散し、接触履歴は乏しい。',f4:'固定費削減意識は中程度。照明・空調更新に関心。',f5:'総務・管理部門が窓口。決裁は稟議、スピードは中。',f6:'新電力の価格提案が定期的に届く。乗換の心理的障壁は低い。',
+  churn:'・電力への関心が低く関係が希薄<br>・価格提案に流されやすい',plays:'・料金最適化の自動提案<br>・LED/空調更新の省エネ診断',
+  ans:{1:'関東の賃貸オフィスで、契約は50kWほど。従業員は40名程度です。',2:'平日の日中がピークで、ほぼ空調とPCですね。夜間と土日はほとんど使いません。',3:'標準メニューのままで、更新時期はあまり意識していません。営業の方とはしばらく話していないです。',4:'固定費は下げたいですが、電気は"そういうもの"と思っていて優先度は高くないですね。',5:'総務が見ていて、切替となれば私（管理部長）が稟議を上げます。即決はしません。',6:'新電力からの案内はよく来ます。安ければ替えてもいい、くらいの温度感です。'}},
+ school:{cluster:'コスト削減型',mode:'price',res:80,kw:'30–80kW（小口〜中口下）',size:'5–40名',yen:'120–400万円',loc:'郊外・駅前',
+  load:[10,20,30,55,85,80,30],loadnote:'夕方〜夜がピーク（授業時間帯）。日中は低い。',
+  f3:'低圧中心。長期休暇期に変動。接触少。',f4:'採算と人件費。空調・照明コストの季節変動が悩み。',f5:'教室長／オーナー決裁。スピードは速い。',f6:'価格訴求に反応。FC本部一括のケースも。',
+  churn:'・夏期の電気代急増に敏感<br>・価格で動きやすい',plays:'・時間帯別メニュー最適化<br>・空調の省エネ提案',
+  ans:{1:'駅前の学習塾で、契約は40kW前後。講師含め15名ほどで運営しています。',2:'夕方から夜にかけて一気に使います。生徒がいる時間帯に空調と照明が集中しますね。',3:'低圧のままです。夏期講習の時期は電気代が跳ねます。',4:'人件費と家賃が重くて、電気代も夏場は気になります。抑えられるなら助かります。',5:'私（教室長）が決めます。良い条件なら比較的すぐ動けます。',6:'他社の案内は来ます。本部から一括で言われれば従う面もあります。'}},
+ fitness:{cluster:'保守効率化型',mode:'price',res:82,kw:'50–150kW（中口下）',size:'5–30名',yen:'300–900万円',loc:'ロードサイド/都心',
+  load:[30,55,60,55,75,85,50],loadnote:'朝と夜にピーク。給湯・空調が重い。24h店は深夜も稼働。',
+  f3:'高圧化も。給湯設備の電力比率が高い。',f4:'給湯・空調コストが利益を圧迫。設備更新余地。',f5:'店長/本部。24h無人はFC本部方針。',f6:'省エネ機器の営業が多い。価格と省エネの両にらみ。',
+  churn:'・給湯/空調コスト増に敏感<br>・省エネ効果を比較検討',plays:'・給湯ヒートポンプ等の省エネ<br>・デマンド制御の提案',
+  ans:{1:'24時間ジムを運営していて、契約は100kWほど。常駐スタッフは少なめです。',2:'給湯とシャワー、空調が主役で、朝晩に山が来ます。無人時間帯も空調は動かします。',3:'高圧に切り替えたばかりです。給湯の電気代が大きいですね。',4:'とにかく給湯と空調のコスト。ここを下げられる提案なら聞きたいです。',5:'本部の方針次第ですが、店舗判断でも動けます。',6:'省エネ機器やデマンド制御の営業がよく来ます。効果があれば前向きです。'}},
+ food:{cluster:'コスト削減型',mode:'price',res:79,kw:'50–100kW（小口下）',size:'個人〜数店舗',yen:'200–500万円',loc:'繁華街・駅前',
+  load:[10,35,85,55,90,70,25],loadnote:'仕込み〜ランチ・ディナーの二山型。厨房負荷が主役で負荷率が高く季節変動も大きい。',
+  f3:'低圧・標準メニュー。更新期の意識は薄く、契約後ほぼ音信不通。',f4:'薄利でコスト圧力が構造的に強い。食材・人件・光熱の三重苦。',f5:'店主＝意思決定者。決裁は速いが関心を引きにくい。',f6:'新電力営業の最大の標的。乗換ハードルが低く離反しやすい。',
+  churn:'・薄利でコスト圧力が構造的に強い<br>・新電力営業の最大の標的<br>・契約後ほぼ音信不通で関係が希薄',plays:'・料金最適化を計算ごと肩代わり<br>・厨房ピークカット等の業態特化省コスト<br>・負荷変化からの解約予兆の先回り',
+  ans:{1:'路面の居酒屋を1店舗、契約は70kWくらい。私が店主で全部見ています。',2:'仕込みからランチ、夜の営業で二回山が来ます。厨房の火とエアコンが一番効いてます。',3:'契約はよく分からないまま標準のままです。電力会社から連絡が来た記憶もないですね。',4:'とにかく利益が薄い。食材も人も光熱も上がって、電気代は正直どこでもいいから安くしたい。',5:'私が決めます。安くなるなら明日にでも替えますよ、話が分かりやすければ。',6:'新電力から電話やチラシがしょっちゅう来ます。安いところがあれば替えると思います。'}},
+ retail:{cluster:'保守効率化型',mode:'price',res:85,kw:'50–200kW（小口〜中口）',size:'10–100名',yen:'300–1,200万円',loc:'商業地/郊外',
+  load:[15,45,70,72,80,60,25],loadnote:'営業時間連動。冷蔵・冷凍ケースが24時間稼働し負荷高め。',
+  f3:'低圧〜高圧。冷蔵設備の比率で差。',f4:'コストと冷蔵設備の電力。省エネ・LED余地。',f5:'店長/本部。チェーンは本部一括。',f6:'価格訴求に敏感。まとめ替えの動きも。',
+  churn:'・冷蔵コスト増に敏感<br>・本部一括で乗換の可能性',plays:'・冷蔵/LEDの省エネ診断<br>・デマンド最適化',
+  ans:{1:'食品スーパーを1店、契約は150kWほど。パート含め50名くらいです。',2:'営業時間に連動しますが、冷蔵・冷凍ケースが24時間効いていて、そこが重いです。',3:'高圧契約です。冷蔵設備の更新も検討中で電気代が気になります。',4:'冷蔵のコストと廃棄ロス。省エネ機器で電気代が下がるなら関心あります。',5:'本部と相談ですが、店舗でもある程度は動けます。',6:'電力の乗換提案は来ます。本部で一括で見直す話も出ています。'}},
+ chain:{cluster:'GX先進型',mode:'price',res:88,kw:'本部一括（多拠点合算で大）',size:'本部+多店舗',yen:'拠点合算で大',loc:'全国/広域',
+  load:[15,50,72,70,78,55,20],loadnote:'業態依存だが本部一括で全社最適の余地が大きい。',
+  f3:'本部一括契約。全社最適の余地大。',f4:'全店の光熱費最適化・脱炭素の対外発信。',f5:'本部の管財・経営企画が決裁。稟議は重いが影響大。',f6:'大口ゆえ各社が本部に営業。乗換は全店規模。',
+  churn:'・全店一括ゆえ流出規模が大<br>・条件比較がシビア',plays:'・全社エネマネ/RE100提案<br>・全店省エネの横展開',
+  ans:{1:'全国で数百店を展開するチェーンの本部です。電力は本部で一括契約しています。',2:'業態によりますが、全店合算だと相当な量で、ピークの平準化が課題です。',3:'本部一括で、更新は全社まとめて。条件次第で大きく動きます。',4:'全店の光熱費最適化と、脱炭素の対外的な打ち出しを両立したいです。',5:'管財と経営企画で検討し、役員決裁です。時間はかかりますが決まれば大きい。',6:'各電力会社が本部に提案に来ます。乗換は全店規模なので慎重に選びます。'}},
+ factory:{cluster:'GX先進型',mode:'value',res:93,kw:'100–500kW（中口）',size:'20–200名',yen:'1,000万〜数千万円',loc:'工業地域',
+  load:[25,82,90,86,62,32,18],loadnote:'昼間稼働の台形型。生産ライン・設備が主役。省エネ余地大。',
+  f3:'高圧・デマンド契約。省エネ相談の履歴あり。',f4:'電力コスト増、取引先からの脱炭素要請、設備更新。',f5:'工場長・経営者。設備投資は稟議・投資回収前提。',f6:'新電力・再エネ提案が接触。PPA/自家消費で差別化余地。',
+  churn:'・競合の再エネ提案接触あり<br>・電力コスト増で乗換検討',plays:'・省エネ診断→PPA→蓄電池<br>・デマンド/ピーク制御',
+  ans:{1:'金属加工の町工場で、高圧480kWほど。従業員は80名です。',2:'昼間の生産時間帯に一定して高く使います。設備とラインが中心ですね。',3:'高圧のデマンド契約です。省エネの相談は以前しました。更新は数か月後です。',4:'電気代の上昇が痛いのと、取引先から脱炭素の対応を求められ始めています。',5:'私（経営者）と工場長で。ただ設備投資は投資回収の見通しが判断の分かれ目です。',6:'再エネやPPAの提案が来ます。初期投資を抑えられるなら真剣に検討します。'}},
+ cold:{cluster:'コスト削減型',mode:'value',res:90,kw:'200–800kW（中口）',size:'10–80名',yen:'数千万円',loc:'臨海/物流地',
+  load:[70,75,80,82,80,76,72],loadnote:'24時間高負荷。冷凍機の連続運転が主役。温度帯で差。',
+  f3:'高圧・大口。デマンドが重い。',f4:'冷凍電力コストが経営を左右。停電=在庫損失のBCP。',f5:'施設管理・経営。投資判断は効果試算重視。',f6:'省エネ制御・自家発の提案。乗換の影響大。',
+  churn:'・冷凍電力コスト増の直撃<br>・BCP不安（停電=全損）',plays:'・冷凍機の省エネ制御<br>・自家発/蓄電でBCP＋ピークカット',
+  ans:{1:'食品の冷凍倉庫で、契約は600kWほど。現場は少人数で回しています。',2:'冷凍機が24時間動きっぱなしで、常に高い負荷です。夏場はさらに上がります。',3:'高圧の大口契約で、デマンドが重いです。電気代が経営を直撃しています。',4:'冷凍の電気代がとにかく大きい。停電は在庫全損なのでBCPも心配です。',5:'施設管理と経営で判断します。効果が数字で見えれば投資します。',6:'省エネ制御や自家発電の提案が来ます。効果次第では大きく動きます。'}},
+ warehouse:{cluster:'人手不足対応型',mode:'value',res:86,kw:'100–400kW（中口）',size:'10–60名',yen:'数百万〜1,000万円',loc:'物流地',
+  load:[20,55,65,68,60,40,25],loadnote:'日中の入出庫連動。照明・搬送・空調が中心。',
+  f3:'高圧。負荷は中程度。',f4:'省人化・自動化、電気代の平準化。',f5:'施設管理・本部。効率化ニーズ高。',f6:'省エネ照明・自動化の提案。',
+  churn:'・省人化投資と両にらみ<br>・電気代の波が読みにくい',plays:'・LED/自動化＋省エネ<br>・デマンド平準化',
+  ans:{1:'常温の配送センターで、契約は250kWほど。現場は40名くらいです。',2:'日中の入出庫に合わせて使います。照明と搬送機、空調が中心です。',3:'高圧契約で、負荷に波がありますがピークの管理が課題です。',4:'人手不足で省人化したい。あわせて電気代も平準化できると助かります。',5:'本部と施設管理で。省力化に効くものは前向きに検討します。',6:'LED化や自動化の提案が来ます。省人化に効けば導入したいです。'}},
+ medical:{cluster:'保守効率化型',mode:'value',res:96,kw:'100–700kW（中口）',size:'20–300名',yen:'数百万〜数千万円',loc:'市街地',
+  load:[55,62,68,65,63,60,58],loadnote:'24時間安定。医療機器・空調・給湯。BCP最重視。',
+  f3:'高圧・安定稼働。長期契約の傾向。',f4:'BCP（停電不可）、省エネ、脱炭素の地域発信。',f5:'事務長・理事長。堅実で長期志向。',f6:'安定志向で乗換は慎重。信頼重視で高LTV。',
+  churn:'・乗換は稀だが競合の信頼獲得に注意<br>・値上げ局面の説明責任',plays:'・BCP（非常用電源/蓄電）<br>・省エネ診断＋脱炭素の地域発信支援',
+  ans:{1:'有床の病院で、契約は600kWほど。職員は200名規模です。',2:'24時間ほぼ一定です。医療機器と空調、給湯が常時動いています。',3:'高圧の安定契約です。長くお付き合いする前提で考えています。',4:'何より停電が許されないのでBCP。加えて省エネと地域への脱炭素の姿勢も大事です。',5:'事務長がまとめ、理事長が決裁します。堅実に、長期目線で判断します。',6:'いろいろ提案は来ますが、安さより信頼と実績で選びます。簡単には替えません。'}},
+ care:{cluster:'コスト削減型',mode:'value',res:88,kw:'50–200kW（中口）',size:'20–100名',yen:'数百万円',loc:'住宅地',
+  load:[45,58,64,62,60,56,50],loadnote:'24時間安定。空調・給湯・介護機器。報酬固定で薄利。',
+  f3:'高圧/低圧。安定だが薄利。',f4:'薄利で光熱費が重い。人手不足。省エネ余地。',f5:'施設長・法人本部。コストに敏感。',f6:'価格＋省エネ提案に反応。乗換は慎重。',
+  churn:'・報酬固定で光熱費増が直撃<br>・薄利ゆえ価格に敏感',plays:'・省エネ診断による電力削減<br>・空調/給湯の効率化',
+  ans:{1:'通所介護の施設で、契約は120kWほど。職員は50名前後です。',2:'日中を中心にほぼ一日動きます。空調と給湯、介護機器が中心です。',3:'契約は安定していますが、報酬が決まっているので光熱費の上昇がこたえます。',4:'薄利なので電気代は切実です。人手不足もあり省力化にも関心があります。',5:'施設長と法人本部で。コスト削減効果が明確だと話が進みやすいです。',6:'価格や省エネの提案は聞きますが、安定を重視するので慎重に選びます。'}},
+ hotel:{cluster:'人手不足対応型',mode:'value',res:87,kw:'150–500kW（中口）',size:'20–200名',yen:'数千万円',loc:'観光地/駅前',
+  load:[40,45,50,55,70,80,75],loadnote:'朝夕にピーク。客室空調・給湯。稼働率で季節変動が大きい。',
+  f3:'高圧。季節・稼働で変動大。',f4:'稼働変動に応じた最適化、省エネ、BCP。',f5:'総支配人・本部。投資は稼働改善と両にらみ。',f6:'省エネ・再エネの提案。ブランド訴求も。',
+  churn:'・季節変動で採算が振れる<br>・稼働低下期のコスト負担',plays:'・稼働連動の料金最適化<br>・客室空調/給湯の省エネ・再エネ',
+  ans:{1:'ビジネスホテルで、契約は300kWほど。客室と宴会場があります。',2:'朝と夕方にピークが来ます。客室の空調と給湯が中心で、季節と稼働で大きく変わります。',3:'高圧契約です。繁忙期と閑散期で電気代の差が大きいのが悩みです。',4:'稼働に応じてコストを最適化したい。省エネや、停電対策も気になります。',5:'総支配人と本部で判断します。稼働改善につながる投資は前向きです。',6:'省エネや再エネの提案が来ます。環境への取り組みは対外的にも打ち出したいです。'}}
+};
+const CLUSTER_PILL={'コスト削減型':'p-red','GX先進型':'p-green','保守効率化型':'p-navy','人手不足対応型':'p-amber','現状維持型':'p-gray'};
+let persChart=null, curPers=null, curPersUnit='';
+function populatePersona(){
+  const sel=document.getElementById('pers-select'); if(sel.dataset.done) return; sel.dataset.done=1;
+  let html='';
+  for(const k in SEG60){const g=SEG60[k];
+    html+=`<optgroup label="${g.bundle}｜${g.name}">`;
+    g.units.forEach((u,i)=>{html+=`<option value="${k}|${i}">${g.name}／${u[0]}｜${u[3]}（${u[1].toLocaleString()}社）</option>`;});
+    html+='</optgroup>';
+  }
+  sel.innerHTML=html;
+}
+function onPersonaSelect(){const v=document.getElementById('pers-select').value.split('|');resolvePersona(v[0],+v[1]);}
+function resolvePersona(key,idx){
+  const t=PERSONA[key], g=SEG60[key], unit=g.units[idx]; curPers=t; curPersUnit=unit[0];
+  CURPK={key:key,idx:idx};
+  const modeLbl=t.mode==='price'?'<span class="pill p-blue">価格感応</span>':'<span class="pill p-red">価値訴求</span>';
+  document.getElementById('pers-title').innerHTML=g.name+' ／ '+unit[0];
+  document.getElementById('pers-badges').innerHTML=modeLbl+' <span class="pill '+SIZE_PILL[unit[3]]+'">需要規模：'+unit[3]+'</span> <span class="pill '+CLUSTER_PILL[t.cluster]+'">'+t.cluster+'</span> <span class="badge">'+unit[1].toLocaleString()+'社</span>';
+  document.getElementById('pers-profile').innerHTML=
+    field(1,'基本属性',`業種：${g.name}／最小単位：${unit[0]}／<b>需要規模：${unit[3]}</b>／契約電力：${t.kw}／規模：${t.size}／年間電気代：${t.yen}／所在地：${t.loc}`,false)+
+    field(2,'電力の使われ方',t.loadnote+'　<span style="color:var(--primary);font-weight:700">★独自資産</span>',true)+
+    field(3,'契約・取引状況',t.f3,false)+
+    field(4,'経営課題・ニーズ',t.f4,false)+
+    field(5,'意思決定の構造',t.f5,false)+
+    field(6,'競合・市場文脈',t.f6,false);
+  document.getElementById('pers-loadnote').innerHTML=t.loadnote;
+  document.getElementById('pers-churn').innerHTML=t.churn;
+  document.getElementById('pers-plays').innerHTML=t.plays;
+  // load chart
+  const col=t.mode==='price'?'#0A6EBD':'#E60012';
+  const ds={labels:['6','9','12','15','18','21','24'],datasets:[{label:'負荷',data:t.load,borderColor:col,backgroundColor:col+'22',fill:true,tension:.4,borderWidth:2,pointRadius:3}]};
+  if(persChart){persChart.data=ds;persChart.update();}
+  else persChart=new Chart(document.getElementById('c_pers_load'),{type:'line',data:ds,options:{plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#EEF2F7'},border:{display:false},min:0,max:100}}}});
+  // reset interview
+  document.getElementById('iv-log').innerHTML='<div class="iva"><div class="who">🎙 '+g.name+'／'+unit[0]+'（AI再現）</div>こんにちは。'+g.name+'を営んでいます。電力のことなら何でも聞いてください。左の①〜⑥、または自由入力でどうぞ。</div>';
+}
+function field(n,label,val,star){return `<div class="pfield${star?' star':''}"><div class="pf-h"><span class="num">${'①②③④⑤⑥'[n-1]}</span>${label}</div><div class="pf-v">${val}</div></div>`;}
+function ivPush(q,a){const log=document.getElementById('iv-log');
+  log.insertAdjacentHTML('beforeend',`<div class="ivq">${q}</div>`);
+  log.insertAdjacentHTML('beforeend',`<div class="iva"><div class="who">🎙 ${curPersUnit}（AI再現）</div>${a}</div>`);
+  log.scrollTop=log.scrollHeight;}
+function askIV(n){if(!curPers)return;ivPush(IV_Q[n],curPers.ans[n]);}
+function autoIV(){[1,2,3,4,5,6].forEach(n=>askIV(n));}
+function askFree(){const inp=document.getElementById('iv-input');const q=(inp.value||'').trim();if(!q||!curPers)return;
+  // 簡易マッチ：キーワードで6問のどれかに寄せて回答（デモ）
+  let n=4; if(/替|乗り換|乗換|安く|値上|価格|料金/.test(q))n=6; else if(/使|負荷|電気の使/.test(q))n=2; else if(/契約|更新/.test(q))n=3; else if(/誰|決め|決裁|稟議/.test(q))n=5; else if(/規模|従業員|何名|契約電力/.test(q))n=1;
+  ivPush(q,curPers.ans[n]); inp.value='';}
+
+/* ===== 6つの支援（p5）＋ トーク生成（p6） ===== */
+let CURPK={key:'food',idx:0};
+const SUP={
+ office:{theme:'料金最適化＋照明・空調の省エネ',talk:'御社の日中中心の使い方なら、料金メニューの見直しとLED・空調の省エネで無理なくコストを下げられます。'},
+ school:{theme:'時間帯別メニュー最適化＋空調省エネ',talk:'夕方に集中する使い方に合う料金メニューへ。夏期講習期の電気代の跳ね上がりも抑えられます。'},
+ fitness:{theme:'給湯・空調の省エネ＋デマンド制御',talk:'給湯と空調が主役の御社は、ヒートポンプとデマンド制御で効果が出やすいです。'},
+ food:{theme:'料金最適化＋厨房ピークカット',talk:'厨房ピークの二山を踏まえ、料金の見直しと簡単なピークカットで月◯円ほど下げられる余地があります。'},
+ retail:{theme:'冷蔵・LEDの省エネ＋デマンド最適化',talk:'24時間動く冷蔵ケースの省エネと料金最適化で、利益率の改善余地があります。'},
+ chain:{theme:'全社エネマネ／RE100＋全店省エネ横展開',talk:'全店を一括で最適化し、脱炭素の対外発信（RE100等）まで一気通貫でご支援できます。'},
+ factory:{theme:'省エネ診断→PPA→蓄電池',talk:'同業の製造業では、初期投資を抑えられるPPA（自家消費）で電力コストと脱炭素を両立する事例が増えています。まず省エネ診断から始めませんか。'},
+ cold:{theme:'冷凍機の省エネ制御＋自家発/蓄電（BCP）',talk:'冷凍電力が経営を左右する御社は、省エネ制御と蓄電でコストとBCPを同時に改善できます。'},
+ warehouse:{theme:'LED/自動化＋デマンド平準化',talk:'省人化と電気代の平準化はセットで実現できます。まず現場の負荷を可視化しましょう。'},
+ medical:{theme:'BCP（非常用電源/蓄電）＋省エネ・脱炭素発信',talk:'停電が許されない御社にこそBCP電源を。省エネと地域への脱炭素発信もご一緒に。'},
+ care:{theme:'省エネ診断＋空調/給湯の効率化',talk:'報酬固定で光熱費が重い今、省エネ診断で無理なくコストを下げられます。'},
+ hotel:{theme:'稼働連動の料金最適化＋客室省エネ・再エネ',talk:'稼働の波に合わせた料金設計と、客室空調・給湯の省エネで繁閑差を吸収できます。'}
+};
+function setSel(id){const s=document.getElementById(id);if(s&&s.options&&s.options.length)s.value=CURPK.key+'|'+CURPK.idx;}
+function populateSupSelect(){const sel=document.getElementById('sup-select');if(!sel||sel.dataset.done)return;sel.dataset.done=1;let h='';for(const k in SEG60){const g=SEG60[k];h+=`<optgroup label="${g.bundle}｜${g.name}">`;g.units.forEach((u,i)=>{h+=`<option value="${k}|${i}">${g.name}／${u[0]}｜${u[3]}（${u[1].toLocaleString()}社）</option>`;});h+='</optgroup>';}sel.innerHTML=h;}
+function onSupSelect(){const v=document.getElementById('sup-select').value.split('|');CURPK={key:v[0],idx:+v[1]};renderSupports();}
+let curSupTab=0;
+function renderSupports(){
+  const k=CURPK.key,i=CURPK.idx,t=PERSONA[k],s=SUP[k],g=SEG60[k],u=g.units[i];
+  const modeTxt=t.mode==='price'?'価格感応':'価値訴求';
+  document.getElementById('p5-tag').textContent=g.name+' / '+u[3]+' / '+t.cluster;
+  document.getElementById('p5-ai').innerHTML=`<b>${g.name}／${u[0]}（需要規模：${u[3]}・${t.cluster}・${modeTxt}）</b>には「<b>${s.theme}</b>」が最有効。タブを選ぶと各支援の具体アクションを表示します。`;
+  showSupTab(curSupTab);
+  setSel('sup-select');
+}
+function showSupTab(n,el){
+  curSupTab=n;
+  const tabs=document.querySelectorAll('#sup-tabs .talk-tab');
+  tabs.forEach((tb,x)=>tb.classList.toggle('active', el? tb===el : x===n));
+  document.getElementById('sup-content').innerHTML=buildSupCard(n);
+}
+function apcard(cat,icon,bg,color,title,level,timing,body,owner,kpi,extra){
+  const lv=level==='高'?'p-red':level==='中'?'p-amber':'p-gray';
+  return `<div class="aplan">
+    <div class="ap-hd"><div class="ap-ic" style="background:${bg};color:${color}">${icon}</div>
+      <div style="flex:1"><div class="ap-cat">${cat}</div><div class="ap-t">${title}</div></div>
+      <span class="pill ${lv}">優先度 ${level}</span></div>
+    <div class="ap-body">${body}</div>
+    <div class="ap-foot"><div class="ap-kv"><span class="k">推奨タイミング</span><span class="v">${timing}</span></div>
+      <div class="ap-kv"><span class="k">担当</span><span class="v">${owner}</span></div>
+      <div class="ap-kv"><span class="k">KPI</span><span class="v">${kpi}</span></div></div>
+    ${extra||''}</div>`;
+}
+function buildSupCard(n){
+  const k=CURPK.key,i=CURPK.idx,t=PERSONA[k],s=SUP[k],g=SEG60[k],u=g.units[i];
+  const price=t.mode==='price';
+  if(n===0) return buildSupSummary();
+  if(n===6) return buildKnowledge(g,t,price,u);
+  const ch=price?'IS / AI':'フィールド営業';
+  const HEAD={
+    1:['① ターゲティング支援','ペルソナ×解約予兆スコアで「今週当てる先」を確定'],
+    2:['② 提案コンテンツ生成',`「${s.theme}」の提案物を自動生成`],
+    3:['③ トーク・FAQ支援','想定課題・切り口・競合対抗トークをカード化'],
+    4:['④ タイミング支援','更新期・負荷急変・問合せ増のトリガーで好機通知'],
+    5:['⑤ チャネル振り分け','ペルソナごとに最適な接触手段を割り当て'],
+    6:['⑥ ナレッジ循環','成約・失注をペルソナに反映し継続精緻化']
+  };
+  let cards=[], extra='';
+  if(n===1) cards=[
+    apcard('リスト生成','🎯','var(--blue-l)','var(--blue)','今週当てる先リストの自動抽出','高','毎週月曜 自動',
+      price?`<b>${g.name}</b>（母数 ${u[1].toLocaleString()}社）を<b>離反予兆スコアの高い順</b>に抽出。量で刈り取る対象を機械的に確定。`
+           :`<b>${g.name}</b>を<b>省エネ余地・BCPニーズの高い順</b>に抽出。高LTVの深掘り対象を確定。`,
+      ch,'リスト消化率'),
+    apcard('セグメント絞込','🧩','var(--navy-l)','var(--navy)','業態×需要規模×離反確率で自動絞込','中','随時',
+      `${g.name}×${price?'小口':'中口'}×離反確率でセグメントを自動生成。優先順位スコアを付与して並べ替え。`,
+      'AI','セグメント精度'),
+    apcard('自動アサイン','🧭','var(--green-l)','var(--green)','担当・ISへの自動割り当て','中','リスト確定時',
+      price?`価格感応ゾーンは<b>IS/AIへ自動アサイン</b>。フィールド営業の足は使わない。`
+           :`価値訴求ゾーンは<b>担当営業へエリア×ペルソナで割当</b>。巡回に束ねる。`,
+      'SFA','アサイン率')
+  ];
+  if(n===2) cards=[
+    apcard('提案書','📄','#F1EAFB','var(--purple)',`「${s.theme}」提案書の自動生成`,'高','リスト配信と同時',
+      `${g.name}の負荷曲線・契約情報から提案書を自動作成。<br><span style="color:var(--text3)">例：${s.talk}</span>`,'提案支援AI','送付数・開封率'),
+    apcard('料金シミュ','🧮','var(--blue-l)','var(--blue)','負荷曲線からの料金・削減額シミュ','高','商談前',
+      `年間電気代 <b>${t.yen}</b> を基に、${s.theme}導入時の削減額・回収年数を自動試算。`,'分析AI','試算提示率'),
+    apcard('見積・試算','🧾','var(--amber-l)','var(--amber)','見積書＋削減効果の試算シート','中','提案時',
+      price?`料金メニュー別の見積を即時発行。`:`省エネ・PPA導入時の削減効果・投資回収を試算し、見積に反映。`,'提案支援AI','見積提出数')
+  ];
+  if(n===3){ cards=[
+    apcard('想定課題カード','💬','var(--primary-l)','var(--primary)','刺さる切り口の提示','高','商談前',
+      `想定課題：<b>${t.f4}</b><br>この課題に効く切り口を${g.name}向けにカード化。`,'営業＋生成AI','商談化率'),
+    apcard('競合対抗トーク','🛡','var(--red-l)','var(--red)','新電力の値引き提案への切り返し','高','商談中',
+      `「他社の方が安い」への切り返しスクリプトを同梱。<b>${price?'負荷データに基づく最適化で総額勝負':'省エネ・BCPの付加価値で差別化'}</b>。`,'営業','受注率'),
+    apcard('想定FAQ','❓','var(--navy-l)','var(--navy)','想定質問への統一回答','中','商談前',
+      `${g.name}から出やすい質問（料金・工事・停電時対応 等）への統一回答を整備。`,'ナレッジ基盤','回答一貫性')
+  ];
+    extra=`<button class="tn-btn" style="width:100%;padding:13px;margin-top:2px" onclick="goToTalk()">✎ この内容で営業スクリプトを生成する　▶（⑥ 営業トーク生成へ）</button>`;
+  }
+  if(n===4) cards=[
+    apcard('更新期アラート','⏰','var(--amber-l)','var(--amber)','契約更新3か月前に自動通知','高','常時監視',
+      `更新期の3か月前を検知し、好機として担当・ISへ通知。${g.name}の更新月に合わせ逆算配信。`,'AI監視','起点反応率'),
+    apcard('負荷急変検知','📈','var(--blue-l)','var(--blue)',price?'使用量の急減＝閉店/移転の予兆':'設備更新期・負荷変化の検知','高','常時監視',
+      price?`使用量の<b>急減を離反/閉店の予兆</b>として検知し、先回り接触。`:`負荷の変化・季節ピークから<b>設備更新期</b>を推定し、省エネ提案の好機を通知。`,'AI監視','予兆的中率'),
+    apcard('競合・問合せ検知','🔔','var(--red-l)','var(--red)','競合接触・問合せ増の検知','中','常時監視',
+      `競合の再エネ/新電力接触や問合せ増を検知し、離反前に先回り接触。`,'AI監視','先回り接触率')
+  ];
+  if(n===5) cards=[
+    apcard('チャネル自動割当','🔀','var(--green-l)','var(--green)','ペルソナ別に最適接点を割当','中','リスト生成時',
+      price?`小口＝<b>メール／SMS／IS（AI自動量産）</b>。フィールドの足は使わない。`:`中口＝<b>フィールド営業＋オンライン面談</b>。ISはアポ前捌き。`,'MA/SFA','チャネル別CVR'),
+    apcard('配信設計','🗓','var(--blue-l)','var(--blue)','頻度・タイミングの最適化','中','継続',
+      `${g.name}の反応データから、配信頻度・曜日時間帯を最適化。過剰接触を抑制。`,'MA','開封/反応率'),
+    apcard('フォールバック','↪','var(--navy-l)','var(--navy)','無反応時の次チャネル切替','低','無反応検知時',
+      `一定期間 無反応なら次チャネルへ自動エスカレーション（メール→IS→訪問）。`,'MA/SFA','再接触率')
+  ];
+  if(n===6) cards=[
+    apcard('結果タグ付け','🏷','var(--navy-l)','var(--navy)','成約/失注の理由を構造化','中','商談クローズ毎',
+      `${g.name}の成約・失注理由をタグ化して蓄積。勝ち筋・負け筋を可視化。`,'データ基盤','タグ付与率'),
+    apcard('ペルソナ再学習','🔄','var(--green-l)','var(--green)','結果をペルソナに反映','中','週次',
+      `蓄積結果を<b>${g.name}</b>ペルソナに反映して再学習。反応確率・トークの精度を継続改善。`,'MLOps','精度改善幅'),
+    apcard('横展開・標準化','📣','var(--primary-l)','var(--primary)','暗黙知の全営業展開','高','四半期',
+      `<b>3,000社の優良営業の暗黙知</b>を勝ちパターンとして全営業へ展開・標準化。`,'営業企画','横展開率')
+  ];
+  if(n===1) extra=churnList(g,price,u);
+  if(n===2) extra=proposalDoc(g,t,s,u,price);
+  const head=HEAD[n];
+  return `<div class="sup-head"><div><div class="st">${head[0]}</div><div class="sd">${head[1]}</div></div><span class="pill ${price?'p-blue':'p-red'}">${price?'価格感応｜量で刈る':'価値訴求｜質で固める'}</span></div>
+    <div class="g2" style="align-items:start">${cards.join('')}</div>${extra}`;
+}
+function buildSupSummary(){
+  const k=CURPK.key,i=CURPK.idx,t=PERSONA[k],s=SUP[k],g=SEG60[k],u=g.units[i];
+  const price=t.mode==='price';
+  const S=[
+    [1,'🎯','① ターゲティング','離反予兆スコアの高い企業リストを自動抽出し「今週当てる先」を確定','高','毎週月曜'],
+    [2,'📄','② 提案コンテンツ',`「${s.theme}」の提案書・料金シミュ・見積を自動生成`,'高','リスト配信と同時'],
+    [3,'💬','③ トーク・FAQ','想定課題・切り口・競合対抗トークをカード化。スクリプト生成へ','高','商談前'],
+    [4,'⏰','④ タイミング','更新期・負荷急変・問合せ増のトリガーで好機通知','中','常時監視'],
+    [5,'🔀','⑤ チャネル振り分け',price?'小口はメール/SMS/IS（AI自動量産）':'中口はフィールド営業＋オンライン面談','中','リスト生成時'],
+    [6,'🔄','⑥ ナレッジ循環','成約/失注をペルソナに反映し、暗黙知を全営業へ標準化','中','商談クローズ毎']
+  ];
+  const flow=`<div class="flow" style="margin-bottom:12px;flex-wrap:wrap"><span class="fstep on">①ターゲティング</span><span class="far">▸</span><span class="fstep on">②提案コンテンツ</span><span class="far">▸</span><span class="fstep on">③トーク・FAQ</span><span class="far">▸</span><span class="fstep on">④タイミング</span><span class="far">▸</span><span class="fstep on">⑤チャネル</span><span class="far">▸</span><span class="fstep on">⑥ナレッジ循環</span></div>`;
+  const cards=S.map(([n,ic,ti,de,lv,tm])=>{const lc=lv==='高'?'p-red':'p-amber';
+    return `<div class="sumcard" onclick="showSupTab(${n})"><span class="go">›</span><div class="sc-n">${ic} 支援${n}</div><div class="sc-t">${ti}</div><div class="sc-d">${de}</div><div class="sc-f"><span class="pill ${lc}">優先度 ${lv}</span><span class="k">${tm}</span></div></div>`;}).join('');
+  return `<div class="sup-head"><div><div class="st">6つの支援の全体像（まとめ）</div><div class="sd">${g.name}／${u[0]}（${u[3]}・${t.cluster}）に、営業活動の流れに沿って供給。カードをクリックで各支援へ。</div></div><span class="pill ${price?'p-blue':'p-red'}">${price?'価格感応｜量で刈る':'価値訴求｜質で固める'}</span></div>${flow}<div class="g3">${cards}</div>`;
+}
+function churnList(g,price,u){
+  const areas=['新宿区','渋谷区','港区','川崎市','横浜市','千葉市','さいたま市','立川市'];
+  let seed=g.name.length*13+7; const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};
+  const base=price?82:60, rows=[];
+  for(let i=0;i<8;i++){
+    const unit=g.units[i%g.units.length];
+    const score=Math.max(28,Math.round(base-i*4-rnd()*6));
+    const col=score>=65?'#DC2626':score>=50?'#D97706':'#159A6C';
+    const act=price?'料金最適化（AI自動）':'省エネ診断→提案';
+    const own=price?'IS / AI':'担当営業';
+    rows.push(`<tr><td class="t-name">${areas[i]}・${unit[0]} ${String.fromCharCode(65+i)}社</td><td><span class="pill ${SIZE_PILL[unit[3]]}">${unit[3]}</span></td><td><span class="scorebar"><span style="width:${score}%;background:${col}"></span></span><b class="mono" style="color:${col}">${score}</b></td><td>${act}</td><td>${own}</td></tr>`);
+  }
+  return `<div class="card" style="margin-top:12px"><div class="card-hd">🎯 離反予兆スコアの高い企業リスト（今週当てる先）<span class="sub">${g.name}／スコア降順・AI自動抽出</span></div>
+    <table><thead><tr><th>企業（仮名）</th><th>需要規模</th><th>離反予兆スコア</th><th>推奨アクション</th><th>担当</th></tr></thead><tbody>${rows.join('')}</tbody></table>
+    <div class="note" style="margin-top:9px">${price?'価格感応ゾーン：予兆スコアの高い順にIS/AIで自動接触し、量で刈り取る。':'価値訴求ゾーン：スコア上位を担当営業へ割り当て、対面で深掘り。'}</div></div>`;
+}
+function proposalDoc(g,t,s,u,price){
+  const costMap={'中口上':6400,'中口下':2800,'小口下':380};
+  const cost=costMap[u[3]], save=price?10:15, saved=Math.round(cost*save/100), after=cost-saved;
+  return `<div class="card" style="margin-top:12px"><div class="card-hd">📄 提案書サンプル（自動生成イメージ）<span class="sub">${g.name}／${s.theme}</span></div>
+   <div class="doc">
+     <div class="doc-hd"><div><span class="dmark">TEPCO</span> <span class="dt">電力コスト最適化 ご提案書</span><div class="dtag">東京電力エナジーパートナー</div></div><span class="pill" style="background:rgba(255,255,255,.18);color:#fff">DRAFT</span></div>
+     <div class="doc-bd">
+       <div class="to">${g.name}／${u[0]}　御中</div>
+       <div class="lead">需要規模：${u[3]}・想定クラスタ：${t.cluster}　｜　本提案はAIマーケットツインが御社の負荷・契約データから自動生成した草案です。</div>
+       <div class="ds"><div class="dsh">1. 御社の現状</div><div class="dsb">需要規模 ${u[3]}／年間電気代 約 <b>${cost.toLocaleString()}万円</b>／${t.loadnote}</div></div>
+       <div class="ds"><div class="dsh">2. 課題整理</div><div class="dsb">${t.f4}</div></div>
+       <div class="ds"><div class="dsh">3. ご提案｜${s.theme}</div><div class="dsb">${s.talk}</div></div>
+       <div class="ds"><div class="dsh">4. 料金シミュレーション（試算）</div>
+         <div class="sim"><div><div style="font-size:9px;color:var(--text3)">現行</div><div class="big" style="color:var(--text2)">${cost.toLocaleString()}</div><div style="font-size:9px;color:var(--text3)">万円/年</div></div><span class="arw">▶</span><div><div style="font-size:9px;color:var(--text3)">想定</div><div class="big">${after.toLocaleString()}</div><div style="font-size:9px;color:var(--text3)">万円/年</div></div><div style="margin-left:auto;text-align:right"><span class="pill p-green" style="font-size:12px">▲${save}%</span><div style="font-size:10px;color:var(--green);font-weight:700;margin-top:4px">年間 約${saved.toLocaleString()}万円 削減</div></div></div></div>
+       <div class="ds"><div class="dsh">5. 導入スケジュール</div><div class="dsb">契約更新期に合わせて逆算。省エネ診断 → 試算 → ご契約まで最短4〜6週間。</div></div>
+     </div>
+     <div class="doc-ft"><span>© 東京電力エナジーパートナー</span><span>AI自動生成ドラフト / 要営業レビュー</span></div>
+   </div>
+   <div style="display:flex;gap:8px;max-width:660px;margin:12px auto 0">
+     <button class="tn-btn" style="flex:1;padding:11px;background:var(--navy)">📄 PDFで出力</button>
+     <button class="tn-btn" style="flex:1;padding:11px" onclick="goToTalk()">✎ この内容でトーク生成 ▶</button>
+   </div>`;
+}
+
+function buildKnowledge(g,t,price,u){
+  const total=Math.max(14,Math.round(u[1]/22));
+  const win=Math.round(total*(price?0.5:0.62)), loss=total-win, rate=Math.round(win/total*100);
+  const WIN=price?['料金シミュで削減額を即提示できた','更新期3か月前の先回り接触が奏功','切替手続きを全て代行し負担ゼロ','他社より年間総額で安価だった','厨房ピークカット等の業態特化提案']
+                 :['省エネ診断の具体数値が刺さった','PPAで初期投資を抑えられた','BCP（非常用電源/蓄電）を評価された','担当の業界知識・提案の信頼性','負荷データに基づく高精度な試算'];
+  const LOSS=price?['他社の値引きが上回った','連絡がつかず・無関心のまま失注','意思決定者（店主）に響かなかった','既存契約の解約金がネックだった']
+                  :['設備投資の判断が保留になった','本部/役員決裁が長期化した','競合の再エネ/PPA提案が先行','効果試算に十分な納得を得られず'];
+  const dist=(tot,arr,w)=>{let rem=tot,out=[];arr.forEach((rz,i)=>{const c=i===arr.length-1?rem:Math.max(1,Math.round(tot*w[i]));const cc=Math.min(c,Math.max(0,rem));rem-=cc;out.push([rz,cc]);});return out;};
+  const winD=dist(win,WIN,[.34,.24,.18,.14,.10]), lossD=dist(loss,LOSS,[.38,.27,.20,.15]);
+  const maxW=Math.max(...winD.map(x=>x[1]),1), maxL=Math.max(...lossD.map(x=>x[1]),1);
+  const row=(rz,c,mx,col)=>`<div class="barrow" style="margin-bottom:9px"><span style="flex:1;font-size:11px;line-height:1.4">${rz}</span><div class="minibar" style="max-width:64px"><span style="width:${Math.round(c/mx*100)}%;background:${col}"></span></div><span class="bv" style="width:26px">${c}</span></div>`;
+  const rowsW=winD.map(([rz,c])=>row(rz,c,maxW,'var(--green)')).join('');
+  const rowsL=lossD.map(([rz,c])=>row(rz,c,maxL,'var(--red)')).join('');
+  return `<div class="sup-head"><div><div class="st">⑥ ナレッジ循環｜成約・失注理由の蓄積</div><div class="sd">${g.name}／${u[0]} の直近90日の商談から、AIが成約/失注理由を構造化して蓄積</div></div><span class="pill ${price?'p-blue':'p-red'}">${price?'価格感応':'価値訴求'}</span></div>
+   <div class="g3" style="margin-bottom:12px">
+     <div class="kpi"><div class="k-strip" style="background:var(--navy)"></div><div class="k-lbl">直近90日 商談</div><div class="k-val">${total}<small> 件</small></div><div class="k-sub">${g.name}</div></div>
+     <div class="kpi"><div class="k-strip" style="background:var(--green)"></div><div class="k-lbl">成約</div><div class="k-val" style="color:var(--green)">${win}<small> 件</small></div><div class="k-sub">勝率 ${rate}%</div></div>
+     <div class="kpi"><div class="k-strip" style="background:var(--red)"></div><div class="k-lbl">失注</div><div class="k-val" style="color:var(--red)">${loss}<small> 件</small></div><div class="k-sub">要因を次アクションへ</div></div>
+   </div>
+   <div class="g2" style="align-items:start">
+     <div class="card"><div class="card-hd" style="color:var(--green)">✅ 成約理由（勝ちパターン）<span class="sub">件数順・蓄積データ</span></div>${rowsW}</div>
+     <div class="card"><div class="card-hd" style="color:var(--red)">❌ 失注理由<span class="sub">件数順・蓄積データ</span></div>${rowsL}</div>
+   </div>
+   <div class="note" style="margin-top:12px">これらの理由を<b>${g.name}ペルソナに反映</b>して再学習。勝ちパターン（最多：<b>${winD[0][0]}</b>）を全営業へ横展開し、失注要因（最多：<b>${lossD[0][0]}</b>）はトーク・提案の改善に反映する。</div>`;
+}
+
+/* ===== 優先対応リスト（p7）ペルソナ選択＋⑤アクション連動 ===== */
+const PRI_ALL=[['food',0],['office',3],['medical',0],['factory',0],['care',1],['retail',0],['cold',0],['hotel',1],['chain',2],['warehouse',1],['school',1],['fitness',1]];
+const OWNERS=['佐藤','鈴木','田中','高橋','伊藤'];
+const FILTER_LABEL={all:'すべて',price:'価格感応',value:'価値訴求',churn50:'離反確率50%以上',ltv:'高LTV',upd:'更新期3か月内',week:'今週当てる先'};
+let curPriFilter='all';
+function actLabel(k){const t=PERSONA[k],s=SUP[k];return t.mode==='price'?'料金最適化（AI自動）':s.theme;}
+function priRowData(k,ui,area,letter,seed){
+  const t=PERSONA[k],g=SEG60[k],u=g.units[ui],price=t.mode==='price';
+  const r=(m)=>{seed=(seed*9301+49297)%233280;return seed/233280*m;};
+  let churn=Math.min(88,Math.round((price?46:20)+r(38)));
+  let loy=Math.max(22,Math.min(92,100-churn-Math.round(r(12))));
+  let reac=Math.round((price?60:78)+r(price?16:12));
+  const upd=r(1)<.38, week=churn>=52;
+  const modePill=price?'p-blue':'p-red';
+  const churnPill=churn>=55?'p-red':churn>=40?'p-amber':'p-green';
+  const churnCol=churn>=55?'var(--red)':churn>=40?'var(--amber)':'var(--green)';
+  const owner=price?'IS / AI':OWNERS[Math.floor(r(OWNERS.length))];
+  const st=churn>=55?['離反予兆','p-red']:churn>=40?['監視','p-amber']:((!price&&churn<30)?['商談化','p-navy']:['フォロー','p-green']);
+  const dt='7/'+String(3+Math.floor(r(26))).padStart(2,'0');
+  const html=`<tr onclick="showPage('p3',document.querySelector('.tn-step[data-page=p3]'))" style="cursor:pointer"><td><div class="t-name">${area}・${u[0]} ${letter}社</div><div class="t-sub">${g.name}${upd?' ・更新期':''}${week?' ・今週':''}</div></td>
+    <td><span class="pill ${modePill}">${g.name}</span> <span class="pill ${SIZE_PILL[u[3]]}">${u[3]}</span></td>
+    <td><span class="pill ${churnPill}">${churn}%</span></td>
+    <td class="mono" style="font-weight:700;color:${churnCol}">${loy}</td>
+    <td class="mono">${reac}%</td>
+    <td>${actLabel(k)}</td><td>${owner}</td><td class="mono">${dt}</td>
+    <td><span class="pill ${st[1]}">${st[0]}</span></td></tr>`;
+  return {mode:t.mode,churn,loy,reac,upd,week,html};
+}
+function populatePriSelect(){const sel=document.getElementById('pri-select');if(!sel||sel.dataset.done)return;sel.dataset.done=1;let h='<option value="all">全体（全ペルソナ混在）</option>';for(const k in SEG60){const g=SEG60[k];h+=`<optgroup label="${g.bundle}｜${g.name}">`;g.units.forEach((u,i)=>{h+=`<option value="${k}|${i}">${g.name}／${u[0]}｜${u[3]}（${u[1].toLocaleString()}社）</option>`;});h+='</optgroup>';}sel.innerHTML=h;}
+function onPriSelect(){ curPriFilter='all'; document.querySelectorAll('.chips .fchip').forEach((c,x)=>c.classList.toggle('active',x===0)); renderPriority(); }
+function priFilter(f,el){ curPriFilter=f; document.querySelectorAll('.chips .fchip').forEach(c=>c.classList.remove('active')); if(el)el.classList.add('active'); renderPriority(); }
+function renderPriority(){
+  const sel=document.getElementById('pri-select'); const val=sel.value||'all';
+  const areas=['新宿区','渋谷区','港区','川崎市','横浜市','千葉市','さいたま市','立川市','船橋市','八王子市','大田区','世田谷区'];
+  let rows=[], note='';
+  if(val==='all'){
+    PRI_ALL.forEach((p,i)=>rows.push(priRowData(p[0],p[1],areas[i%areas.length],String.fromCharCode(65+i),(i+3)*97)));
+    note='全ペルソナ混在の優先対応先。<b>ペルソナを選ぶと推奨アクションが⑤営業アクションに連動</b>。フィルタで さらに絞り込めます。';
+  }else{
+    const parts=val.split('|'),k=parts[0],idx=+parts[1],t=PERSONA[k],g=SEG60[k],u=g.units[idx],price=t.mode==='price';
+    for(let i=0;i<10;i++){rows.push(priRowData(k,idx,areas[i%areas.length],String.fromCharCode(65+i),(i+1)*131+k.length*7));}
+    note=`<b>${g.name}／${u[0]}</b>（${u[3]}・${price?'価格感応':'価値訴求'}）｜母数 ${u[1].toLocaleString()}社。推奨アクション：<b>${actLabel(k)}</b>（⑤営業アクション連動）。`;
+  }
+  const f=curPriFilter;
+  const filtered=rows.filter(x=> f==='all'?true : f==='price'?x.mode==='price' : f==='value'?x.mode==='value' : f==='churn50'?x.churn>=50 : f==='ltv'?x.loy>=70 : f==='upd'?x.upd : f==='week'?x.week : true);
+  document.getElementById('pri-tbody').innerHTML=filtered.length?filtered.map(x=>x.html).join(''):`<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:22px">該当なし ── フィルタ「${FILTER_LABEL[f]}」に合う先がありません</td></tr>`;
+  document.getElementById('pri-note').innerHTML=note+` <span style="color:var(--text3)">｜フィルタ：<b>${FILTER_LABEL[f]}</b>　表示 ${filtered.length}件</span>`;
+}
+function goToTalk(){genTalk();showPage('p6',document.querySelector('.tn-step[data-page=p6]'));}
+function genTalk(){
+  const k=CURPK.key,i=CURPK.idx,t=PERSONA[k],s=SUP[k],g=SEG60[k],u=g.units[i];
+  const price=t.mode==='price', first=price?'料金シミュレーション':'無料の省エネ診断';
+  document.getElementById('talk-meta').innerHTML=`<div class="selbox"><span class="sl">対象</span>${g.name}／${u[0]}</div><div class="selbox"><span class="sl">需要規模</span>${u[3]}</div><div class="selbox"><span class="sl">クラスタ</span>${t.cluster}</div><div class="selbox"><span class="sl">提案テーマ</span>${s.theme}</div><div class="selbox"><span class="sl">チャネル</span>${price?'メール/IS 中心':'営業訪問 中心'}</div>`;
+  document.getElementById('tk-visit').textContent=`${s.talk}\n\n更新期や電力使用量の動きから見ても、いまが検討しやすいタイミングです。まずは${first}から始めさせてください。`;
+  document.getElementById('tk-mail').textContent=`件名：【東京電力EP】${g.name}さま向け ${s.theme} のご案内\n\nご担当者さま\n\nいつもお世話になっております。東京電力エナジーパートナーでございます。\n\n${s.talk}\n\nつきましては、${first}をご提案させてください。ご都合のよい日程を2〜3ついただけますと幸いです。`;
+  document.getElementById('tk-call').textContent=`【架電スクリプト】\n\n〈導入〉お世話になっております、東京電力EPでございます。3分ほどよろしいでしょうか。\n\n〈本題〉${s.talk}\n\n〈クロージング〉まずは${first}だけでもいかがでしょうか。来週あたりで30分お時間いただけませんか？\n\n〈想定切り返し〉「他社からも提案が来ている」→ 御社の負荷データに基づく内容ですので、一般的な提案とは精度が違います。`;
+  document.getElementById('tk-doc').textContent=`【提案書 骨子】\n\n1. 御社の現状（負荷曲線・年間電気代 ${t.yen}・${g.name}の使い方）\n2. 課題整理（${t.f4}）\n3. ご提案：${s.theme}\n4. 導入効果試算（削減額・CO2削減・投資回収）\n5. 導入スケジュール（更新期に合わせた逆算）\n6. 同業（${g.name}）の導入事例`;
+  document.getElementById('tk-ref').textContent=`${g.name} 勝ちパターン ${20+i*3+(price?18:32)}件`;
+  document.getElementById('tk-acc').textContent=(price?72:86)+'%';
+  document.getElementById('tk-cta').textContent=first+'のアポ';
+  document.querySelectorAll('#p6 .talk-body').forEach((b,x)=>b.classList.toggle('active',x===0));
+  document.querySelectorAll('#p6 .talk-tab').forEach((tb,x)=>tb.classList.toggle('active',x===0));
+}
+
+function showTalk(id, el){
+  document.querySelectorAll('.talk-body').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.talk-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ===== FILTER CHIPS (visual) ===== */
+document.querySelectorAll('.fchip').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('.fchip').forEach(x=>x.classList.remove('active'));
+  c.classList.add('active');
+}));
+document.querySelectorAll('.tog').forEach(t=>t.addEventListener('click',()=>{ if(t.dataset.layer) return; t.classList.toggle('on'); }));
+
+/* ===== CHART DEFAULTS ===== */
+Chart.defaults.font.family="'Noto Sans JP',sans-serif";
+Chart.defaults.font.size=11;
+Chart.defaults.color="#51617A";
+Chart.defaults.plugins.legend.labels.boxWidth=10;
+Chart.defaults.plugins.legend.labels.boxHeight=10;
+Chart.defaults.plugins.legend.labels.padding=12;
+const RED="#E60012",NAVY="#0B2A4A",BLUE="#0A6EBD",GREEN="#159A6C",AMBER="#D97706",TEAL="#0E8AA0",GRAY="#CBD5E1";
+
+/* ===== GIS MAP（国土地理院タイル / Leaflet） ===== */
+let gsiMap=null, gsiLayers={};
+function buildGsiMap(){
+  if(gsiMap){ setTimeout(()=>gsiMap.invalidateSize(),80); return; }
+  if(typeof L==='undefined') return; // Leaflet未ロード時は何もしない
+  gsiMap=L.map('gsi-map',{scrollWheelZoom:true}).setView([35.62,139.75],10);
+  L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',{
+    attribution:"地図：<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>国土地理院</a>",maxZoom:18
+  }).addTo(gsiMap);
+  gsiLayers.pins=L.layerGroup().addTo(gsiMap);
+  gsiLayers.risk=L.layerGroup().addTo(gsiMap);
+  gsiLayers.heat=L.layerGroup().addTo(gsiMap);
+  gsiLayers.area=L.layerGroup().addTo(gsiMap);
+  // 需要ヒートマップ（濃淡の面）
+  [[35.69,139.70,2800,'#DC2626'],[35.47,139.63,2400,'#0A6EBD'],[35.70,139.45,1500,'#DC2626'],[35.66,139.98,2000,'#0A6EBD'],[35.86,139.63,1400,'#DC2626']]
+    .forEach(([la,ln,r,c])=>{L.circle([la,ln],{radius:r,color:c,weight:0,fillColor:c,fillOpacity:.13}).addTo(gsiLayers.heat);});
+  // 担当営業エリア
+  [[35.69,139.70,'佐藤（4名）','#0A6EBD',7000],[35.47,139.63,'鈴木（3名）','#159A6C',6500],[35.70,139.45,'田中（2名）','#D97706',6000],[35.66,139.98,'高橋（2名）','#7C4DBB',6500],[35.86,139.63,'伊藤（1名）','#0E8AA0',5500]]
+    .forEach(([la,ln,nm,c,r])=>{L.circle([la,ln],{radius:r,color:c,weight:2,dashArray:'5 6',fillColor:c,fillOpacity:.05}).addTo(gsiLayers.area).bindTooltip('担当エリア：'+nm,{sticky:true});});
+  // 顧客ピン（1社1ピン・ペルソナ色分け・離反リスク強調）
+  const colors={office:'#0A6EBD',food:'#D97706',mfg:'#E60012',facility:'#0E8AA0'};
+  const pnames={office:'オフィス・事務',food:'商業・飲食',mfg:'製造・物流',facility:'施設・公共/医療'};
+  const acts={office:'更新期メール／IS',food:'料金最適化（AI自動）',mfg:'省エネ診断→PPA',facility:'BCP・省エネ提案'};
+  const clusters=[
+    [35.690,139.700,.06,'food',42],[35.688,139.702,.065,'office',26],[35.685,139.705,.05,'facility',10], // 東京23区
+    [35.470,139.630,.06,'mfg',30],[35.472,139.632,.055,'facility',14],[35.468,139.635,.05,'food',10],    // 川崎・横浜
+    [35.700,139.450,.06,'office',20],[35.702,139.452,.05,'facility',8],[35.698,139.455,.05,'food',8],     // 多摩
+    [35.860,139.630,.06,'office',16],[35.862,139.632,.055,'food',14],[35.858,139.635,.05,'facility',6],   // 埼玉南部
+    [35.655,139.980,.07,'mfg',24],[35.660,139.985,.06,'facility',12],[35.650,139.975,.05,'office',8],     // 千葉ベイ
+  ];
+  let seed=13;const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};
+  let idc=1;
+  clusters.forEach(([la,ln,sp,type,n])=>{
+    for(let i=0;i<n;i++){
+      const a=la+(rnd()-.5)*sp, o=ln+(rnd()-.5)*sp*1.5;
+      const churn=Math.round((type==='food'?45:18)+rnd()*45);
+      const risk=churn>=55, c=risk?'#DC2626':colors[type];
+      const m=L.circleMarker([a,o],{radius:risk?8:5,color:'#fff',weight:1.5,fillColor:c,fillOpacity:.92});
+      m.bindPopup(`<b>${pnames[type]}</b>（デモ ${idc}社目）<br>ペルソナ：${type}／${risk?'<b style="color:#DC2626">離反リスク高</b>':'安定'}<br>離反確率：<b style="color:${risk?'#DC2626':'#159A6C'}">${churn}%</b><br>推奨アクション：${acts[type]}`);
+      m.addTo(risk?gsiLayers.risk:gsiLayers.pins); idc++;
+    }
+  });
+  setTimeout(()=>gsiMap.invalidateSize(),80);
+}
+function toggleLayer(name,el){
+  el.classList.toggle('on');
+  const on=el.classList.contains('on'), lyr=gsiLayers[name];
+  if(!gsiMap||!lyr) return;
+  if(on) lyr.addTo(gsiMap); else gsiMap.removeLayer(lyr);
+}
+
+/* ===== CHART BUILDERS ===== */
+function initCharts(page){
+  if(chartInit[page]) { if(page==='p4') buildGsiMap(); return; }
+  chartInit[page]=true;
+  const noGrid={grid:{display:false}}, softGrid={grid:{color:'#EEF2F7'},border:{display:false}};
+
+  if(page==='p1'){
+    new Chart(c_care,{type:'doughnut',data:{labels:['ケア済み','未ケア（AI捕捉）'],datasets:[{data:[3000,12000],backgroundColor:[GREEN,RED],borderWidth:2,borderColor:'#fff'}]},options:{cutout:'62%',plugins:{legend:{position:'bottom'}}}});
+    new Chart(c_status,{type:'doughnut',data:{labels:['ロイヤル','継続見込み','離反見込み'],datasets:[{data:[4180,9180,1640],backgroundColor:[BLUE,'#9DBFDD',RED],borderWidth:2,borderColor:'#fff'}]},options:{cutout:'62%',plugins:{legend:{position:'bottom'}}}});
+    new Chart(c_scale,{type:'bar',data:{labels:['小口下','中口下','中口上'],datasets:[{label:'社数',data:[8700,4500,1800],backgroundColor:[NAVY,BLUE,RED],borderRadius:5,barThickness:44}]},options:{plugins:{legend:{display:false}},scales:{x:noGrid,y:softGrid}}});
+    drill('food'); // 12業態→60→180 ドリルの初期表示（最多セグメント）
+  }
+
+  if(page==='p2'){
+    populatePersona();
+    resolvePersona('food',0); // 初期表示：飲食店（路面店）＝P18相当
+  }
+
+  if(page==='p3'){
+    const hrs=['6','9','12','15','18','21','24'];
+    new Chart(c_load_a,{type:'line',data:{labels:hrs,datasets:[{label:'A社 負荷',data:[25,82,90,86,62,32,18],borderColor:GREEN,backgroundColor:'rgba(21,154,108,.12)',fill:true,tension:.35,borderWidth:2,pointRadius:3}]},options:{plugins:{legend:{display:false}},scales:{x:noGrid,y:{...softGrid,min:0,max:100}}}});
+  }
+
+  if(page==='p4'){ buildGsiMap(); }
+}
+initCharts('p1');
+</script>
+</body>
+</html>
