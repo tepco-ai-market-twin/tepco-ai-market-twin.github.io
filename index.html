@@ -211,7 +211,20 @@ tbody tr:hover{background:var(--bg)}
 .mtot .mp{font-size:8px;color:var(--text3);margin-top:2px}
 .mtot.grand{background:var(--navy);color:#fff}
 .mtot.grand .mp{color:#B9CCE0}
+.mband{grid-column:1 / -1;display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:6px;font-size:11px;font-weight:700;margin-top:4px}
+.mband .bn{margin-left:auto;font-family:var(--mono);font-size:13px;font-weight:900}
+.mband.exist{background:var(--navy-l);color:var(--navy);border:1px solid #C9DDF0}
+.mband.prospect{background:var(--green-l);color:var(--green);border:1px solid var(--green-l2)}
+.msub{background:#F0F3F7;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 3px;color:var(--text2)}
+.msub .mv{font-size:14px;font-weight:900;font-family:var(--mono);line-height:1}
+.msub .mp{font-size:8px;color:var(--text3);margin-top:2px}
 
+/* 顧客区分トグル */
+.segtoggle{display:inline-flex;border:1px solid var(--border2);border-radius:8px;overflow:hidden}
+.segtoggle button{border:none;background:var(--white);color:var(--text2);font-size:11px;font-weight:700;padding:7px 14px;cursor:pointer;font-family:var(--font)}
+.segtoggle button+button{border-left:1px solid var(--border2)}
+.segtoggle button.on{background:var(--navy);color:#fff}
+.segtoggle button.on.prospect{background:var(--green)}
 /* 12業態 breakdown */
 .biz12{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .bizcol{display:flex;flex-direction:column;gap:8px}
@@ -506,51 +519,85 @@ h4.sec{font-size:11px;font-weight:700;color:var(--text2);margin:2px 0 10px;lette
 
     <!-- SEGMENTATION MATRIX (Market Overview の考え方) -->
     <div class="card" style="margin-bottom:12px">
-      <div class="card-hd">■ セグメンテーション設計 ── 需要規模 × 業種業態（各マス＝対象社数）
-        <span class="sub">この二軸マトリクスが全15,000社を理解・配分する土台。マス目をクリックでペルソナ詳細へ</span></div>
+      <div class="card-hd">■ セグメンテーション設計 ── 顧客区分 × 需要規模 × 業種業態（各マス＝対象社数）
+        <span class="sub">表側に「既存顧客（15,000社）」＋「未顧客（新規開拓）」の2区分。マス目クリックでペルソナ詳細へ</span></div>
       <div class="matrix-ov" style="margin-top:8px">
         <!-- header -->
-        <div class="mh"><span style="font-size:9px;color:var(--text3)">需要規模＼業種業態</span></div>
+        <div class="mh"><span style="font-size:9px;color:var(--text3)">区分・需要規模＼業種業態</span></div>
         <div class="mh">オフィス<small class="p-blue">価格感応</small></div>
         <div class="mh">商業飲食<small class="p-blue">価格感応</small></div>
         <div class="mh">医療介護<small class="p-red">価値訴求</small></div>
         <div class="mh">工場他<small class="p-red">価値訴求</small></div>
         <div class="mh" style="color:var(--text)">計</div>
-        <!-- 中口上 -->
+
+        <!-- ==== 既存顧客バンド ==== -->
+        <div class="mband exist">🔵 既存顧客（TEPCO契約中・AIマーケットツイン対象）<span class="bn">15,000 社</span></div>
         <div class="ml">中口上</div>
         <div class="mcell clk" style="background:#9DBFDD;color:#0F1B2D" onclick="goPersona()"><div class="mv">210</div><div class="mp">価格感応</div></div>
         <div class="mcell clk" style="background:#9DBFDD;color:#0F1B2D" onclick="goPersona()"><div class="mv">180</div><div class="mp">価格感応</div></div>
         <div class="mcell clk" style="background:#E8636F;color:#fff" onclick="goPersona()"><div class="mv">780</div><div class="mp">価値訴求</div></div>
         <div class="mcell clk" style="background:var(--primary);color:#fff" onclick="goPersona()"><span class="star">★</span><div class="mv">1,150</div><div class="mp">価値訴求</div></div>
         <div class="mtot"><div class="mv">2,320</div><div class="mp">中口上 計</div></div>
-        <!-- 中口下 -->
         <div class="ml">中口下</div>
         <div class="mcell clk" style="background:#7EA9CF;color:#fff" onclick="goPersona()"><div class="mv">720</div><div class="mp">価格感応</div></div>
         <div class="mcell clk" style="background:#5E93C6;color:#fff" onclick="goPersona()"><div class="mv">1,240</div><div class="mp">価格感応</div></div>
         <div class="mcell clk" style="background:#E8636F;color:#fff" onclick="goPersona()"><div class="mv">1,420</div><div class="mp">価値訴求</div></div>
         <div class="mcell clk" style="background:#E85560;color:#fff" onclick="goPersona()"><div class="mv">1,540</div><div class="mp">価値訴求</div></div>
         <div class="mtot"><div class="mv">4,920</div><div class="mp">中口下 計</div></div>
-        <!-- 小口下 -->
         <div class="ml">小口下</div>
         <div class="mcell clk" style="background:#5E93C6;color:#fff" onclick="goPersona()"><div class="mv">1,870</div><div class="mp">価格感応</div></div>
         <div class="mcell clk" style="background:#2E6DA4;color:#fff" onclick="goPersona()"><span class="star">★</span><div class="mv">3,580</div><div class="mp">価格感応</div></div>
         <div class="mcell clk" style="background:#EFA0A6;color:#0F1B2D" onclick="goPersona()"><div class="mv">1,180</div><div class="mp">価値訴求</div></div>
         <div class="mcell clk" style="background:#EFA0A6;color:#0F1B2D" onclick="goPersona()"><div class="mv">1,130</div><div class="mp">価値訴求</div></div>
         <div class="mtot"><div class="mv">7,760</div><div class="mp">小口下 計</div></div>
-        <!-- totals row -->
-        <div class="ml" style="color:var(--text)">計</div>
-        <div class="mtot"><div class="mv">2,800</div><div class="mp">オフィス</div></div>
-        <div class="mtot"><div class="mv">5,000</div><div class="mp">商業飲食</div></div>
-        <div class="mtot"><div class="mv">3,380</div><div class="mp">医療介護</div></div>
-        <div class="mtot"><div class="mv">3,820</div><div class="mp">工場他</div></div>
-        <div class="mtot grand"><div class="mv">15,000</div><div class="mp">全法人顧客</div></div>
+        <div class="ml" style="color:var(--navy)">小計</div>
+        <div class="msub"><div class="mv">2,800</div><div class="mp">オフィス</div></div>
+        <div class="msub"><div class="mv">5,000</div><div class="mp">商業飲食</div></div>
+        <div class="msub"><div class="mv">3,380</div><div class="mp">医療介護</div></div>
+        <div class="msub"><div class="mv">3,820</div><div class="mp">工場他</div></div>
+        <div class="mtot" style="background:var(--navy-l);color:var(--navy)"><div class="mv">15,000</div><div class="mp">既存 計</div></div>
+
+        <!-- ==== 未顧客バンド ==== -->
+        <div class="mband prospect">🟢 未顧客（新規開拓ターゲット・供給エリア内の非契約）<span class="bn">45,000 社 <span style="font-size:9px;font-weight:600">※仮</span></span></div>
+        <div class="ml">中口上</div>
+        <div class="mcell clk" style="background:#C4EFDD;color:#0F1B2D" onclick="goPersona()"><div class="mv">400</div><div class="mp">未開拓</div></div>
+        <div class="mcell clk" style="background:#C4EFDD;color:#0F1B2D" onclick="goPersona()"><div class="mv">300</div><div class="mp">未開拓</div></div>
+        <div class="mcell clk" style="background:#8FD9BB;color:#0F1B2D" onclick="goPersona()"><div class="mv">900</div><div class="mp">未開拓</div></div>
+        <div class="mcell clk" style="background:#57BE93;color:#fff" onclick="goPersona()"><div class="mv">1,500</div><div class="mp">未開拓</div></div>
+        <div class="msub"><div class="mv">3,100</div><div class="mp">中口上 計</div></div>
+        <div class="ml">中口下</div>
+        <div class="mcell clk" style="background:#57BE93;color:#fff" onclick="goPersona()"><div class="mv">1,600</div><div class="mp">未開拓</div></div>
+        <div class="mcell clk" style="background:#57BE93;color:#fff" onclick="goPersona()"><div class="mv">2,400</div><div class="mp">未開拓</div></div>
+        <div class="mcell clk" style="background:#57BE93;color:#fff" onclick="goPersona()"><div class="mv">2,200</div><div class="mp">未開拓</div></div>
+        <div class="mcell clk" style="background:#2E9E72;color:#fff" onclick="goPersona()"><div class="mv">3,200</div><div class="mp">未開拓</div></div>
+        <div class="msub"><div class="mv">9,400</div><div class="mp">中口下 計</div></div>
+        <div class="ml">小口下</div>
+        <div class="mcell clk" style="background:#2E9E72;color:#fff" onclick="goPersona()"><span class="star">★</span><div class="mv">7,000</div><div class="mp">未開拓</div></div>
+        <div class="mcell clk" style="background:#159A6C;color:#fff" onclick="goPersona()"><span class="star">★</span><div class="mv">15,000</div><div class="mp">未開拓</div></div>
+        <div class="mcell clk" style="background:#57BE93;color:#fff" onclick="goPersona()"><div class="mv">3,200</div><div class="mp">未開拓</div></div>
+        <div class="mcell clk" style="background:#2E9E72;color:#fff" onclick="goPersona()"><div class="mv">7,300</div><div class="mp">未開拓</div></div>
+        <div class="msub"><div class="mv">32,500</div><div class="mp">小口下 計</div></div>
+        <div class="ml" style="color:var(--green)">小計</div>
+        <div class="msub"><div class="mv">9,000</div><div class="mp">オフィス</div></div>
+        <div class="msub"><div class="mv">17,700</div><div class="mp">商業飲食</div></div>
+        <div class="msub"><div class="mv">6,300</div><div class="mp">医療介護</div></div>
+        <div class="msub"><div class="mv">12,000</div><div class="mp">工場他</div></div>
+        <div class="mtot" style="background:var(--green-l);color:var(--green)"><div class="mv">45,000</div><div class="mp">未顧客 計</div></div>
+
+        <!-- ==== 全ポテンシャル ==== -->
+        <div class="ml" style="color:var(--text)">合計</div>
+        <div class="mtot"><div class="mv">11,800</div><div class="mp">オフィス</div></div>
+        <div class="mtot"><div class="mv">22,700</div><div class="mp">商業飲食</div></div>
+        <div class="mtot"><div class="mv">9,680</div><div class="mp">医療介護</div></div>
+        <div class="mtot"><div class="mv">15,820</div><div class="mp">工場他</div></div>
+        <div class="mtot grand"><div class="mv">60,000</div><div class="mp">全ポテンシャル</div></div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:12px">
-        <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--text2)"><span style="width:34px;height:12px;border-radius:3px;background:linear-gradient(90deg,#9DBFDD,#2E6DA4);display:inline-block"></span>価格感応型（量で攻める）＝<b>7,800社</b></div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--text2)"><span style="width:34px;height:12px;border-radius:3px;background:linear-gradient(90deg,#EFA0A6,var(--primary));display:inline-block"></span>価値訴求型（質で固める）＝<b>7,200社</b></div>
-        <div style="font-size:10.5px;color:var(--text3)">★＝優先対応セグメント／濃淡＝対象社数の多寡</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--text2)"><span style="width:34px;height:12px;border-radius:3px;background:linear-gradient(90deg,#9DBFDD,#2E6DA4);display:inline-block"></span>既存顧客（青系）＝<b>15,000社</b></div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--text2)"><span style="width:34px;height:12px;border-radius:3px;background:linear-gradient(90deg,#C4EFDD,#159A6C);display:inline-block"></span>未顧客（緑系）＝<b>45,000社 ※仮</b></div>
+        <div style="font-size:10.5px;color:var(--text3)">★＝優先セグメント／濃淡＝対象社数の多寡</div>
       </div>
-      <div class="note" style="margin-top:8px">縦に需要規模（小口下／中口下／中口上）、横に業種業態（電力の使われ方＝負荷曲線で束ねた4束）。営業の打ち手が変わる境目で切り、12業態→60→180の打ち手単位まで分解可能。</div>
+      <div class="note" style="margin-top:8px">表側に<b>顧客区分（既存顧客／未顧客）× 需要規模</b>、表頭に<b>業種業態</b>。既存15,000社は<b>AIマーケットツイン（ペルソナ・個社再現）の対象</b>、未顧客45,000社（仮）は<b>供給エリア内の非契約＝新規開拓の余地</b>。同じ業種業態ペルソナで打ち手を横展開できる。<span style="color:var(--text3)">※未顧客の社数は仮値。実データ（企業DB/GIS・SanSan/Eight等）で置換可能。</span></div>
     </div>
 
     <!-- 12業態への分解（粒度1） -->
@@ -558,36 +605,15 @@ h4.sec{font-size:11px;font-weight:700;color:var(--text2);margin:2px 0 10px;lette
       <div class="card-hd">横軸の4束を、電力の使われ方を起点に12業態へ分解する
         <span class="sub">業態カードをクリックすると、60の最小単位（粒度2）ごとの対象社数が下に表示されます</span>
         <span class="badge" style="background:var(--primary);color:#fff">粒度1</span></div>
-      <div class="biz12" style="margin-top:6px">
-        <!-- col1 事務・サービス系 -->
-        <div class="bizcol">
-          <div class="bizhd price"><div class="bh-top"><span class="bh-ic">📄</span><span class="pill p-blue">価格感応</span></div><div class="bh-nm">事務・サービス系</div><div class="bh-c">平日昼間ピーク／空調主体・計2,800社</div></div>
-          <div class="bizcard" onclick="drill('office',this)"><div class="bc-nm">オフィス・士業事務所</div><div class="bc-r"><span class="bc-c" style="color:var(--text3)">小〜中口</span><span class="bc-n">1,600<small>社</small></span></div></div>
-          <div class="bizcard" onclick="drill('school',this)"><div class="bc-nm">学習塾・教育施設</div><div class="bc-r"><span class="bc-c" style="color:var(--text3)">小〜中口</span><span class="bc-n">720<small>社</small></span></div></div>
-          <div class="bizcard" onclick="drill('fitness',this)"><div class="bc-nm">フィットネス・スポーツ</div><div class="bc-r"><span class="bc-c" style="color:var(--text3)">中口・給湯重い</span><span class="bc-n">480<small>社</small></span></div></div>
+      <div style="display:flex;align-items:center;gap:10px;margin:2px 0 12px;flex-wrap:wrap">
+        <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.03em">顧客区分フィルタ</span>
+        <div class="segtoggle">
+          <button class="on" data-mode="exist" onclick="setCustMode('exist')">🔵 既存顧客　15,000社</button>
+          <button data-mode="prospect" onclick="setCustMode('prospect')">🟢 未顧客　45,000社</button>
         </div>
-        <!-- col2 商業・飲食系 -->
-        <div class="bizcol">
-          <div class="bizhd price"><div class="bh-top"><span class="bh-ic">🏪</span><span class="pill p-blue">価格感応</span></div><div class="bh-nm">商業・飲食系</div><div class="bh-c">営業時間連動／夕方ピーク・計5,000社</div></div>
-          <div class="bizcard" onclick="drill('food',this)"><div class="bc-nm">飲食店（路面店）</div><div class="bc-r"><span class="bc-c" style="color:var(--text3)">小口・最多</span><span class="bc-n">3,200<small>社</small></span></div></div>
-          <div class="bizcard" onclick="drill('retail',this)"><div class="bc-nm">物販・小売店舗</div><div class="bc-r"><span class="bc-c" style="color:var(--text3)">小〜中口</span><span class="bc-n">1,300<small>社</small></span></div></div>
-          <div class="bizcard" onclick="drill('chain',this)"><div class="bc-nm">チェーン本部系列店</div><div class="bc-r"><span class="bc-c" style="color:var(--text3)">本部一括</span><span class="bc-n">500<small>社</small></span></div></div>
-        </div>
-        <!-- col3 製造・物流系 -->
-        <div class="bizcol">
-          <div class="bizhd value"><div class="bh-top"><span class="bh-ic">🏭</span><span class="pill p-red">価値訴求</span></div><div class="bh-nm">製造・物流系</div><div class="bh-c">昼間稼働／冷凍は高負荷・計3,820社</div></div>
-          <div class="bizcard" onclick="drill('factory',this)"><div class="bc-nm">中小工場・町工場</div><div class="bc-r"><span class="bc-c" style="color:var(--primary)">中口・省エネ余地大</span><span class="bc-n">2,100<small>社</small></span></div></div>
-          <div class="bizcard" onclick="drill('cold',this)"><div class="bc-nm">冷蔵冷凍倉庫</div><div class="bc-r"><span class="bc-c" style="color:var(--primary)">中口・高負荷</span><span class="bc-n">980<small>社</small></span></div></div>
-          <div class="bizcard" onclick="drill('warehouse',this)"><div class="bc-nm">常温倉庫・物流</div><div class="bc-r"><span class="bc-c" style="color:var(--primary)">中口</span><span class="bc-n">740<small>社</small></span></div></div>
-        </div>
-        <!-- col4 施設・公共系 -->
-        <div class="bizcol">
-          <div class="bizhd value"><div class="bh-top"><span class="bh-ic">🏥</span><span class="pill p-red">価値訴求</span></div><div class="bh-nm">施設・公共系</div><div class="bh-c">24時間安定／BCP重視・計3,380社</div></div>
-          <div class="bizcard" onclick="drill('medical',this)"><div class="bc-nm">医療（病院・診療所）</div><div class="bc-r"><span class="bc-c" style="color:var(--primary)">中口・高LTV</span><span class="bc-n">1,480<small>社</small></span></div></div>
-          <div class="bizcard" onclick="drill('care',this)"><div class="bc-nm">介護・福祉施設</div><div class="bc-r"><span class="bc-c" style="color:var(--primary)">中口・薄利</span><span class="bc-n">1,180<small>社</small></span></div></div>
-          <div class="bizcard" onclick="drill('hotel',this)"><div class="bc-nm">宿泊（ホテル・旅館）</div><div class="bc-r"><span class="bc-c" style="color:var(--primary)">中口・季節変動</span><span class="bc-n">720<small>社</small></span></div></div>
-        </div>
+        <span class="note cust-note" style="margin-left:auto">既存顧客 15,000社（AIマーケットツイン対象）</span>
       </div>
+      <div class="biz12" id="biz12-grid" style="margin-top:2px"></div>
       <div class="note" style="margin-top:12px"><b>MECEの担保：</b>「電力の使われ方（負荷の素性）」を一次軸に据えることで、どの需要家も必ず一つの業態に属し重複しない。業種コードの細かさに引きずられず、営業の打ち手が変わる単位で切っている。</div>
     </div>
 
@@ -644,6 +670,14 @@ h4.sec{font-size:11px;font-weight:700;color:var(--text2);margin:2px 0 10px;lette
 
     <!-- selector -->
     <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.03em">顧客区分</span>
+        <div class="segtoggle">
+          <button class="on" data-mode="exist" onclick="setCustMode('exist')">🔵 既存顧客</button>
+          <button data-mode="prospect" onclick="setCustMode('prospect')">🟢 未顧客</button>
+        </div>
+        <span class="note cust-note" style="margin-left:auto">既存顧客 15,000社（AIマーケットツイン対象）</span>
+      </div>
       <div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:5px;letter-spacing:.04em">業態を選択（Market Overviewの60最小単位）</div>
       <select id="pers-select" class="selctl" style="min-width:min(520px,100%)" onchange="onPersonaSelect()"></select>
     </div>
@@ -797,13 +831,22 @@ h4.sec{font-size:11px;font-weight:700;color:var(--text2);margin:2px 0 10px;lette
     <div class="breadcrumb">TEPCO 法人AIマーケットツイン <span>›</span> <span class="cur">GIS／エリアマップ</span></div>
     <div class="page-header">
       <div class="ph-left"><div class="ph-num">3</div>
-        <div><div class="ph-title">GIS／エリアマップ ── 営業エリア戦略に落とす</div>
-        <div class="ph-sub">どのエリアに・どのペルソナが・どれだけいるか。担当割り当てと巡回ルート設計につなげる</div></div>
+        <div><div class="ph-title" id="gis-title">GIS／エリアマップ ── 営業エリア戦略に落とす</div>
+        <div class="ph-sub" id="gis-sub">どのエリアに・どのペルソナが・どれだけいるか。担当割り当てと巡回ルート設計につなげる</div></div>
       </div>
       <div class="ph-tag">国土地理院 地図 / 供給地点特定番号ベース</div>
     </div>
 
-    <div class="ai-bar"><span class="aic">✦</span><span><b>空白地の発見：</b><b>川崎・横浜臨海部</b>は製造中口の需要密度が高いが顧客が薄い<b>優先開拓地</b>。<b>新宿・渋谷</b>は飲食小口の離反リスクが密集。ピンをクリックで個社の離反確率・推奨アクションを表示。担当エリア×ペルソナで巡回を再設計。</span></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+      <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.03em">表示するページ</span>
+      <div class="segtoggle">
+        <button class="on" data-mode="exist" onclick="setCustMode('exist')">🔵 既存顧客の攻略</button>
+        <button data-mode="prospect" onclick="setCustMode('prospect')">🟢 未顧客の新規開拓</button>
+      </div>
+      <span class="note cust-note" style="margin-left:auto">既存顧客 15,000社（維持・深耕）</span>
+    </div>
+
+    <div class="ai-bar"><span class="aic">✦</span><span id="gis-ai"></span></div>
 
     <!-- 3-step framing（住所を座標に変え、ペルソナを地図に載せ、営業判断につなぐ） -->
     <div class="g3" style="margin-bottom:12px">
@@ -822,7 +865,7 @@ h4.sec{font-size:11px;font-weight:700;color:var(--text2);margin:2px 0 10px;lette
             <div class="lgi"><span class="lgd" style="background:var(--amber)"></span>商業・飲食（価格感応）</div>
             <div class="lgi"><span class="lgd" style="background:var(--primary)"></span>製造・物流（価値訴求）</div>
             <div class="lgi"><span class="lgd" style="background:var(--teal)"></span>施設・公共/医療（価値訴求）</div>
-            <div class="lgi" style="margin-top:4px;border-top:1px dashed var(--border);padding-top:5px"><span class="lgd" style="width:14px;height:14px;background:var(--red)"></span><b>大きい赤＝離反リスク高</b>（≥55%）</div>
+            <div class="lgi" id="gis-legend-risk" style="margin-top:4px;border-top:1px dashed var(--border);padding-top:5px"><span class="lgd" style="width:14px;height:14px;background:var(--red)"></span><b>大きい赤＝離反リスク高</b>（≥55%）</div>
             <div class="lgi" style="font-size:9.5px;color:var(--text3)">面の濃淡＝需要密度ヒートマップ</div>
           </div>
         </div>
@@ -835,9 +878,9 @@ h4.sec{font-size:11px;font-weight:700;color:var(--text2);margin:2px 0 10px;lette
             <div class="barrow"><span style="width:13px;height:13px;border-radius:50%;background:var(--amber);border:1.5px solid #fff;box-shadow:0 0 0 1px var(--border);flex-shrink:0"></span><span style="font-size:11px">商業・飲食 <span class="pill p-blue" style="margin-left:2px">価格感応</span></span></div>
             <div class="barrow"><span style="width:13px;height:13px;border-radius:50%;background:var(--primary);border:1.5px solid #fff;box-shadow:0 0 0 1px var(--border);flex-shrink:0"></span><span style="font-size:11px">製造・物流 <span class="pill p-red" style="margin-left:2px">価値訴求</span></span></div>
             <div class="barrow"><span style="width:13px;height:13px;border-radius:50%;background:var(--teal);border:1.5px solid #fff;box-shadow:0 0 0 1px var(--border);flex-shrink:0"></span><span style="font-size:11px">施設・公共/医療 <span class="pill p-red" style="margin-left:2px">価値訴求</span></span></div>
-            <div class="barrow" style="border-top:1px dashed var(--border);padding-top:7px;margin-top:1px"><span style="width:18px;height:18px;border-radius:50%;background:var(--red);border:1.5px solid #fff;box-shadow:0 0 0 1px var(--border);flex-shrink:0"></span><span style="font-size:11px"><b style="color:var(--red)">大きい赤ピン</b>＝離反確率 <b>55%以上</b></span></div>
+            <div class="barrow" id="gis-pin-risk" style="border-top:1px dashed var(--border);padding-top:7px;margin-top:1px"><span style="width:18px;height:18px;border-radius:50%;background:var(--red);border:1.5px solid #fff;box-shadow:0 0 0 1px var(--border);flex-shrink:0"></span><span style="font-size:11px"><b style="color:var(--red)">大きい赤ピン</b>＝離反確率 <b>55%以上</b></span></div>
           </div>
-          <div class="note" style="margin-top:9px"><b>色＝ペルソナ業態</b>（価格感応/価値訴求）、<b>サイズ・赤＝離反リスク</b>、<b>面の濃淡＝需要密度</b>。ピンをクリックで離反確率・推奨アクションを表示。</div>
+          <div class="note" id="gis-pin-note" style="margin-top:9px"><b>色＝ペルソナ業態</b>（価格感応/価値訴求）、<b>サイズ・赤＝離反リスク</b>、<b>面の濃淡＝需要密度</b>。ピンをクリックで離反確率・推奨アクションを表示。</div>
         </div>
         <div class="card" style="margin-bottom:12px">
           <div class="card-hd">表示レイヤー<span class="sub">トグルで地図に反映</span></div>
@@ -850,43 +893,15 @@ h4.sec{font-size:11px;font-weight:700;color:var(--text2);margin:2px 0 10px;lette
           <div class="layer-toggle"><span>人口密度レイヤー</span><span class="tog"></span></div>
         </div>
         <div class="card">
-          <div class="card-hd">エリア別サマリ<span class="sub">担当割り当て</span></div>
-          <table><thead><tr><th>エリア</th><th>社数</th><th>離反高</th><th>担当</th></tr></thead><tbody>
-            <tr><td class="t-name">東京23区</td><td class="mono">5,240</td><td><span class="pill p-red">720</span></td><td>佐藤(4)</td></tr>
-            <tr><td class="t-name">川崎・横浜</td><td class="mono">3,180</td><td><span class="pill p-amber">340</span></td><td>鈴木(3)</td></tr>
-            <tr><td class="t-name">多摩・武蔵野</td><td class="mono">2,410</td><td><span class="pill p-amber">280</span></td><td>田中(2)</td></tr>
-            <tr><td class="t-name">千葉ベイ</td><td class="mono">1,870</td><td><span class="pill p-red">190</span></td><td>高橋(2)</td></tr>
-            <tr><td class="t-name">埼玉南部</td><td class="mono">2,300</td><td><span class="pill p-amber">110</span></td><td>伊藤(1)</td></tr>
-          </tbody></table>
-          <div class="note" style="margin-top:10px">既存顧客データに「座標」と「ペルソナ」の2列を足すだけで地図/BIに載る。新規構築より軽く、早い。</div>
+          <div class="card-hd" id="gis-area-title">エリア別サマリ<span class="sub">担当割り当て</span></div>
+          <table><thead id="gis-area-head"></thead><tbody id="gis-area-body"></tbody></table>
+          <div class="note" id="gis-area-note" style="margin-top:10px"></div>
         </div>
       </div>
     </div>
 
-    <!-- ③ 営業判断：営業割り当て方針 -->
-    <div class="card" style="margin-bottom:12px">
-      <div class="card-hd">🧭 営業割り当て方針 ── エリア × ペルソナ × 離反リスクで配分<span class="sub">二正面作戦で人的リソースを最適化</span></div>
-      <div class="two-front">
-        <div class="tf price"><div class="tf-h">⚡ 価格感応ゾーン｜量で刈る（IS/AI中心）</div><ul>
-          <li>飲食小口・オフィス小口など＝<b>フィールド営業を割り当てない</b></li>
-          <li>離反予兆スコアの高い順に<b>メール/SMS/IS・AI自動提案</b>で捕捉</li>
-          <li>例：新宿・渋谷の飲食小口の離反密集ゾーンを自動接触</li></ul></div>
-        <div class="tf value"><div class="tf-h">🎯 価値訴求ゾーン｜質で固める（フィールド営業）</div><ul>
-          <li>製造・医療・倉庫の中口＝<b>担当営業が対面で深掘り</b></li>
-          <li>省エネ余地・BCPニーズの高い順に担当へ割り当て</li>
-          <li>例：川崎・横浜臨海の製造中口を鈴木チームが専任担当</li></ul></div>
-      </div>
-      <div class="note" style="margin-top:10px">解約予兆の検知 → 流出前の先回り接触までを一気通貫で回し、<b>営業の足を価値訴求ゾーンへ再配置</b>する。担当割り当ては「エリア×ペルソナ」で自動マッピング。</div>
-    </div>
-
-    <div class="g3">
-      <div class="card"><div class="card-hd">🧭 担当割り当て<span class="sub">エリア × ペルソナ</span></div>
-        <div class="note" style="line-height:1.8">エリアとペルソナの組合せで、誰がどこを持つかを最適化。<br>例：<b>川崎・横浜の製造中口＝鈴木チーム（価値訴求で深掘り）</b>／新宿・渋谷の飲食小口＝<b>IS/AIで自動捕捉（価格感応）</b>。フィールド営業の足を価値訴求ゾーンへ再配置。</div></div>
-      <div class="card"><div class="card-hd">🚗 巡回ルート最適化<span class="sub">中口の価値訴求先を束ねる</span></div>
-        <div class="note" style="line-height:1.8">地理的に近い高LTV先をまとめて1日で巡回。<br>例：<b>川崎臨海の製造・冷凍倉庫8社</b>を最短ルートで訪問。更新期・離反予兆の近い順に自動並べ替え。</div></div>
-      <div class="card"><div class="card-hd">⚑ 空白地帯の発見<span class="sub">優先開拓地</span></div>
-        <div class="note" style="line-height:1.8">需要密度は高いが顧客が薄いゾーンを抽出。<br>例：<b>川崎・横浜臨海部（製造中口）</b>、<b>幕張・千葉ベイ（物流）</b>。ヒートマップ濃×ピン薄の差分で機械的に検出。</div></div>
-    </div>
+    <div id="gis-strategy" style="margin-bottom:12px"></div>
+    <div class="g3" id="gis-3cards"></div>
   </section>
 
   <!-- ============ PAGE 5 : RECOMMENDED ACTION ============ -->
@@ -904,6 +919,14 @@ h4.sec{font-size:11px;font-weight:700;color:var(--text2);margin:2px 0 10px;lette
 
     <!-- persona selector -->
     <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.03em">顧客区分</span>
+        <div class="segtoggle">
+          <button class="on" data-mode="exist" onclick="setCustMode('exist')">🔵 既存顧客</button>
+          <button data-mode="prospect" onclick="setCustMode('prospect')">🟢 未顧客</button>
+        </div>
+        <span class="note cust-note" style="margin-left:auto">既存顧客 15,000社（AIマーケットツイン対象）</span>
+      </div>
       <div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:5px;letter-spacing:.04em">AIペルソナを選択（Market Overviewの60最小単位）</div>
       <select id="sup-select" class="selctl" style="min-width:min(520px,100%)" onchange="onSupSelect()"></select>
     </div>
@@ -933,6 +956,14 @@ h4.sec{font-size:11px;font-weight:700;color:var(--text2);margin:2px 0 10px;lette
       <div class="ph-tag">生成AI / 勝ちパターン学習</div>
     </div>
 
+    <div style="display:flex;align-items:center;gap:10px;margin:0 0 12px;flex-wrap:wrap">
+      <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.03em">顧客区分</span>
+      <div class="segtoggle">
+        <button class="on" data-mode="exist" onclick="setCustMode('exist')">🔵 既存顧客</button>
+        <button data-mode="prospect" onclick="setCustMode('prospect')">🟢 未顧客</button>
+      </div>
+      <span class="note cust-note" style="margin-left:auto">既存顧客 15,000社（AIマーケットツイン対象）</span>
+    </div>
     <div class="talk-meta" id="talk-meta" style="margin:0 0 14px"></div>
 
     <div class="talk-tabs">
@@ -973,18 +1004,22 @@ h4.sec{font-size:11px;font-weight:700;color:var(--text2);margin:2px 0 10px;lette
     <div class="breadcrumb">TEPCO 法人AIマーケットツイン <span>›</span> <span class="cur">優先対応リスト</span></div>
     <div class="page-header">
       <div class="ph-left"><div class="ph-num">7</div>
-        <div><div class="ph-title">優先対応リスト ── 12,000社を実行に落とす</div>
-        <div class="ph-sub">離反確率・LTV・反応確率でスコアリングし「今週当てる先」を配信。二正面作戦で管理</div></div>
+        <div><div class="ph-title" id="pri-title">優先対応リスト ── 既存顧客の攻略</div>
+        <div class="ph-sub" id="pri-sub">離反確率・LTV・反応確率でスコアリングし「今週当てる先」を配信</div></div>
       </div>
-      <div class="ph-tag">未ケア 12,000社 / 週次更新</div>
+      <div class="ph-tag" id="pri-tag">既存 15,000社 / 週次更新</div>
     </div>
 
-    <div class="two-front" style="margin-bottom:14px">
-      <div class="tf price"><div class="tf-h">⚡ 価格感応ゾーン｜量で刈り取る <span class="pill p-blue" style="margin-left:auto">7,800社</span></div>
-        <ul><li>AIが料金最適化提案を標準テンプレで自動量産</li><li>解約予兆スコアの高い順にデジタル接点／ISで接触</li><li>フィールド営業の足は使わず、仕組みで捕捉</li></ul></div>
-      <div class="tf value"><div class="tf-h">🎯 価値訴求ゾーン｜質で固める <span class="pill p-red" style="margin-left:auto">7,200社</span></div>
-        <ul><li>負荷曲線から省エネ余地・BCPニーズの高い先を抽出</li><li>業種別の脱炭素・BCP提案テンプレを営業に供給</li><li>営業がピンポイントで深掘り、高LTVで固定化</li></ul></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+      <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.03em">表示するページ</span>
+      <div class="segtoggle">
+        <button class="on" data-mode="exist" onclick="setCustMode('exist')">🔵 既存顧客の攻略</button>
+        <button data-mode="prospect" onclick="setCustMode('prospect')">🟢 未顧客の新規開拓</button>
+      </div>
+      <span class="note cust-note" style="margin-left:auto">既存顧客 15,000社（維持・深耕）</span>
     </div>
+
+    <div class="two-front" id="pri-banner" style="margin-bottom:14px"></div>
 
     <!-- persona selector -->
     <div class="card" style="margin-bottom:12px">
@@ -997,25 +1032,15 @@ h4.sec{font-size:11px;font-weight:700;color:var(--text2);margin:2px 0 10px;lette
       </div>
     </div>
 
-    <div class="chips">
-      <div class="fchip active" onclick="priFilter('all',this)">すべて<span class="fc-n">12,000</span></div>
-      <div class="fchip" onclick="priFilter('price',this)">価格感応<span class="fc-n">7,800</span></div>
-      <div class="fchip" onclick="priFilter('value',this)">価値訴求<span class="fc-n">7,200</span></div>
-      <div class="fchip" onclick="priFilter('churn50',this)">離反確率50%以上<span class="fc-n">1,640</span></div>
-      <div class="fchip" onclick="priFilter('ltv',this)">高LTV<span class="fc-n">4,180</span></div>
-      <div class="fchip" onclick="priFilter('upd',this)">更新期3か月内<span class="fc-n">2,100</span></div>
-      <div class="fchip" onclick="priFilter('week',this)">今週当てる先<span class="fc-n">320</span></div>
-    </div>
+    <div class="chips" id="pri-chips"></div>
 
     <div class="card" style="padding:6px 8px">
       <table>
-        <thead><tr>
-          <th>顧客名</th><th>ペルソナ / 需要規模</th><th>離反確率</th><th>ロイヤリティ</th><th>反応確率</th><th>推奨アクション（⑤営業アクション連動）</th><th>担当</th><th>次回接触</th><th>ステータス</th>
-        </tr></thead>
+        <thead id="pri-thead"></thead>
         <tbody id="pri-tbody"></tbody>
       </table>
     </div>
-    <div class="note" style="margin-top:12px;text-align:center">全12,000社を離反確率×LTV×反応確率でスコアリング。共通の仕組み：<b>ペルソナ判定 › 打ち手・提案生成 › 優先度スコアリング › 接点・営業へ配信 › 効果測定で再学習</b></div>
+    <div class="note" id="pri-foot" style="margin-top:12px;text-align:center"></div>
   </section>
 
   </main>
@@ -1034,7 +1059,8 @@ function showPage(id, el){
   initCharts(id);
   if(id==='p5'){ populateSupSelect(); setSel('sup-select'); renderSupports(); }
   if(id==='p6'){ genTalk(); }
-  if(id==='p7'){ populatePriSelect(); const ps=document.getElementById('pri-select'); if(ps.options.length) ps.value=CURPK.key+'|'+CURPK.idx; curPriFilter='all'; document.querySelectorAll('.chips .fchip').forEach((c,x)=>c.classList.toggle('active',x===0)); renderPriority(); }
+  if(id==='p7'){ populatePriSelect(); const ps=document.getElementById('pri-select'); if(ps.options.length) ps.value=CURPK.key+'|'+CURPK.idx; curPriFilter='all'; renderPriority(); }
+  syncToggles();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function goPersona(){ showPage('p2', document.querySelector('.tn-step[data-page=p2]')); }
@@ -1094,24 +1120,61 @@ const SEG60={
    ['宿泊研修所',70,['企業研修所','保養所','公共宿泊施設'],'小口下']]}
 };
 const SIZE_PILL={'中口上':'p-red','中口下':'p-amber','小口下':'p-gray'};
+
+/* ===== 顧客区分（既存顧客／未顧客）フィルタ ===== */
+let custMode='exist';
+const FACTOR={'事務・サービス系':9000/2800,'商業・飲食系':17700/5000,'製造・物流系':12000/3820,'施設・公共系':6300/3380};
+const BIZ_BUNDLES=[
+ {name:'事務・サービス系',mode:'price',ic:'📄',char:'平日昼間ピーク／空調主体',keys:['office','school','fitness']},
+ {name:'商業・飲食系',mode:'price',ic:'🏪',char:'営業時間連動／夕方ピーク',keys:['food','retail','chain']},
+ {name:'製造・物流系',mode:'value',ic:'🏭',char:'昼間稼働／冷凍は高負荷',keys:['factory','cold','warehouse']},
+ {name:'施設・公共系',mode:'value',ic:'🏥',char:'24時間安定／BCP重視',keys:['medical','care','hotel']}
+];
+const BIZ_NOTE={office:'小〜中口',school:'小〜中口',fitness:'中口・給湯重い',food:'小口・最多',retail:'小〜中口',chain:'本部一括',factory:'中口・省エネ余地大',cold:'中口・高負荷',warehouse:'中口',medical:'中口・高LTV',care:'中口・薄利',hotel:'中口・季節変動'};
+function unitCount(g,u){return custMode==='exist'?u[1]:Math.round(u[1]*FACTOR[g.bundle]);}
+function gyotaiTotal(g){return g.units.reduce((s,u)=>s+unitCount(g,u),0);}
+function buildBiz12(){
+  const grid=document.getElementById('biz12-grid'); if(!grid) return;
+  grid.innerHTML=BIZ_BUNDLES.map(b=>{
+    const bt=b.keys.reduce((s,k)=>s+gyotaiTotal(SEG60[k]),0);
+    const cls=b.mode==='price'?'price':'value', pill=b.mode==='price'?'p-blue':'p-red', pl=b.mode==='price'?'価格感応':'価値訴求';
+    const noteCol=b.mode==='price'?'var(--text3)':'var(--primary)';
+    const cards=b.keys.map(k=>{const g=SEG60[k];const c=gyotaiTotal(g);
+      return `<div class="bizcard" onclick="drill('${k}',this)"><div class="bc-nm">${g.name}</div><div class="bc-r"><span class="bc-c" style="color:${noteCol}">${BIZ_NOTE[k]}</span><span class="bc-n">${c.toLocaleString()}<small>社</small></span></div></div>`;}).join('');
+    return `<div class="bizcol"><div class="bizhd ${cls}"><div class="bh-top"><span class="bh-ic">${b.ic}</span><span class="pill ${pill}">${pl}</span></div><div class="bh-nm">${b.name}</div><div class="bh-c">${b.char}・計${bt.toLocaleString()}社</div></div>${cards}</div>`;
+  }).join('');
+}
+function syncToggles(){document.querySelectorAll('.segtoggle button').forEach(b=>{const on=b.dataset.mode===custMode;b.classList.toggle('on',on);b.classList.toggle('prospect',on&&custMode==='prospect');});}
+function setCustMode(m){
+  custMode=m; syncToggles();
+  const txt=m==='exist'?'既存顧客 15,000社（AIマーケットツイン対象）':'未顧客 45,000社（新規開拓・仮値）';
+  document.querySelectorAll('.cust-note').forEach(n=>n.textContent=txt);
+  if(document.getElementById('biz12-grid')){ buildBiz12(); if(curKey) drill(curKey); }
+  const ps=document.getElementById('pers-select'); if(ps){ ps.dataset.done=''; populatePersona(); setSel('pers-select'); resolvePersona(CURPK.key,CURPK.idx); }
+  const ss=document.getElementById('sup-select'); if(ss){ ss.dataset.done=''; populateSupSelect(); setSel('sup-select'); renderSupports(); }
+  const pr=document.getElementById('pri-select'); if(pr){ pr.dataset.done=''; populatePriSelect(); pr.value=CURPK.key+'|'+CURPK.idx; curPriFilter='all'; renderPriority(); }
+  if(document.getElementById('talk-meta')) genTalk();
+  if(document.getElementById('gis-ai')) refreshGis();
+}
 let curKey=null;
 function drill(key,el){
   curKey=key; const g=SEG60[key]; const col=MODE_COLOR[g.mode];
   if(!el) el=[...document.querySelectorAll('.bizcard')].find(c=>(c.getAttribute('onclick')||'').includes("'"+key+"'"));
   document.querySelectorAll('.bizcard').forEach(c=>c.classList.remove('sel')); if(el) el.classList.add('sel');
-  document.getElementById('drill-title').innerHTML='最小単位への分解｜<b style="color:var(--primary)">'+g.bundle+' › '+g.name+'</b>（計 '+g.total.toLocaleString()+' 社 → 5最小単位）';
+  const seg=custMode==='exist'?'既存顧客':'未顧客';
+  document.getElementById('drill-title').innerHTML='最小単位への分解｜<b style="color:var(--primary)">'+g.bundle+' › '+g.name+'</b>（'+seg+'：計 '+gyotaiTotal(g).toLocaleString()+' 社 → 5最小単位）';
   document.getElementById('drill-lv2-title').innerHTML='60最小単位（粒度2）｜<b>'+g.name+'</b>';
-  const max=Math.max(...g.units.map(u=>u[1]));
-  document.getElementById('drill-units').innerHTML=g.units.map((u,i)=>
-    `<div class="drow" onclick="drillUnit(${i},this)"><span class="dn">${u[0]}</span><span class="pill ${SIZE_PILL[u[3]]}" style="font-size:9px;padding:1px 6px;flex-shrink:0">${u[3]}</span><div class="minibar"><span style="width:${Math.round(u[1]/max*100)}%;background:${col}"></span></div><span class="dc">${u[1].toLocaleString()}</span><span class="darr">▸</span></div>`).join('');
+  const max=Math.max(...g.units.map(u=>unitCount(g,u)));
+  document.getElementById('drill-units').innerHTML=g.units.map((u,i)=>{const c=unitCount(g,u);
+    return `<div class="drow" onclick="drillUnit(${i},this)"><span class="dn">${u[0]}</span><span class="pill ${SIZE_PILL[u[3]]}" style="font-size:9px;padding:1px 6px;flex-shrink:0">${u[3]}</span><div class="minibar"><span style="width:${Math.round(c/max*100)}%;background:${col}"></span></div><span class="dc">${c.toLocaleString()}</span><span class="darr">▸</span></div>`;}).join('');
   document.getElementById('drill-lv3-title').innerHTML='180打ち手単位（粒度3）｜対象社数';
   document.getElementById('drill-branches').innerHTML='<div class="note" style="padding:22px 10px;text-align:center;border:1px dashed var(--border);border-radius:8px">← 左の<b>最小単位</b>を選択すると、3つの<b>打ち手単位（粒度3）</b>ごとの対象社数に分解されます</div>';
 }
 function drillUnit(i,el){
   const g=SEG60[curKey]; const u=g.units[i]; const col=MODE_COLOR[g.mode];
   document.querySelectorAll('#drill-units .drow').forEach(r=>r.classList.remove('sel')); el.classList.add('sel');
-  const parts=split3(u[1],i); const max=Math.max(...parts,1);
-  document.getElementById('drill-lv3-title').innerHTML='180打ち手単位（粒度3）｜<b style="color:var(--primary)">'+u[0]+'</b>（3分岐 → 計 '+u[1].toLocaleString()+' 社）';
+  const parts=split3(unitCount(g,u),i); const max=Math.max(...parts,1);
+  document.getElementById('drill-lv3-title').innerHTML='180打ち手単位（粒度3）｜<b style="color:var(--primary)">'+u[0]+'</b>（3分岐 → 計 '+unitCount(g,u).toLocaleString()+' 社）';
   document.getElementById('drill-branches').innerHTML=u[2].map((bn,k)=>
     `<div class="brow"><span class="bn">${bn}</span><div class="minibar"><span style="width:${Math.round(parts[k]/max*100)}%;background:${col}"></span></div><span class="bc">${parts[k].toLocaleString()}</span></div>`).join('');
 }
@@ -1187,7 +1250,7 @@ function populatePersona(){
   let html='';
   for(const k in SEG60){const g=SEG60[k];
     html+=`<optgroup label="${g.bundle}｜${g.name}">`;
-    g.units.forEach((u,i)=>{html+=`<option value="${k}|${i}">${g.name}／${u[0]}｜${u[3]}（${u[1].toLocaleString()}社）</option>`;});
+    g.units.forEach((u,i)=>{html+=`<option value="${k}|${i}">${g.name}／${u[0]}｜${u[3]}（${unitCount(g,u).toLocaleString()}社）</option>`;});
     html+='</optgroup>';
   }
   sel.innerHTML=html;
@@ -1198,7 +1261,7 @@ function resolvePersona(key,idx){
   CURPK={key:key,idx:idx};
   const modeLbl=t.mode==='price'?'<span class="pill p-blue">価格感応</span>':'<span class="pill p-red">価値訴求</span>';
   document.getElementById('pers-title').innerHTML=g.name+' ／ '+unit[0];
-  document.getElementById('pers-badges').innerHTML=modeLbl+' <span class="pill '+SIZE_PILL[unit[3]]+'">需要規模：'+unit[3]+'</span> <span class="pill '+CLUSTER_PILL[t.cluster]+'">'+t.cluster+'</span> <span class="badge">'+unit[1].toLocaleString()+'社</span>';
+  document.getElementById('pers-badges').innerHTML=modeLbl+' <span class="pill '+SIZE_PILL[unit[3]]+'">需要規模：'+unit[3]+'</span> <span class="pill '+CLUSTER_PILL[t.cluster]+'">'+t.cluster+'</span> <span class="badge">'+(custMode==='exist'?'既存':'未顧客')+' '+unitCount(g,unit).toLocaleString()+'社</span>';
   document.getElementById('pers-profile').innerHTML=
     field(1,'基本属性',`業種：${g.name}／最小単位：${unit[0]}／<b>需要規模：${unit[3]}</b>／契約電力：${t.kw}／規模：${t.size}／年間電気代：${t.yen}／所在地：${t.loc}`,false)+
     field(2,'電力の使われ方',t.loadnote+'　<span style="color:var(--primary);font-weight:700">★独自資産</span>',true)+
@@ -1246,7 +1309,7 @@ const SUP={
  hotel:{theme:'稼働連動の料金最適化＋客室省エネ・再エネ',talk:'稼働の波に合わせた料金設計と、客室空調・給湯の省エネで繁閑差を吸収できます。'}
 };
 function setSel(id){const s=document.getElementById(id);if(s&&s.options&&s.options.length)s.value=CURPK.key+'|'+CURPK.idx;}
-function populateSupSelect(){const sel=document.getElementById('sup-select');if(!sel||sel.dataset.done)return;sel.dataset.done=1;let h='';for(const k in SEG60){const g=SEG60[k];h+=`<optgroup label="${g.bundle}｜${g.name}">`;g.units.forEach((u,i)=>{h+=`<option value="${k}|${i}">${g.name}／${u[0]}｜${u[3]}（${u[1].toLocaleString()}社）</option>`;});h+='</optgroup>';}sel.innerHTML=h;}
+function populateSupSelect(){const sel=document.getElementById('sup-select');if(!sel||sel.dataset.done)return;sel.dataset.done=1;let h='';for(const k in SEG60){const g=SEG60[k];h+=`<optgroup label="${g.bundle}｜${g.name}">`;g.units.forEach((u,i)=>{h+=`<option value="${k}|${i}">${g.name}／${u[0]}｜${u[3]}（${unitCount(g,u).toLocaleString()}社）</option>`;});h+='</optgroup>';}sel.innerHTML=h;}
 function onSupSelect(){const v=document.getElementById('sup-select').value.split('|');CURPK={key:v[0],idx:+v[1]};renderSupports();}
 let curSupTab=0;
 function renderSupports(){
@@ -1292,17 +1355,20 @@ function buildSupCard(n){
   let cards=[], extra='';
   if(n===1) cards=[
     apcard('リスト生成','🎯','var(--blue-l)','var(--blue)','今週当てる先リストの自動抽出','高','毎週月曜 自動',
-      price?`<b>${g.name}</b>（母数 ${u[1].toLocaleString()}社）を<b>離反予兆スコアの高い順</b>に抽出。量で刈り取る対象を機械的に確定。`
+      price?`<b>${g.name}</b>（母数 ${unitCount(g,u).toLocaleString()}社）を<b>離反予兆スコアの高い順</b>に抽出。量で刈り取る対象を機械的に確定。`
            :`<b>${g.name}</b>を<b>省エネ余地・BCPニーズの高い順</b>に抽出。高LTVの深掘り対象を確定。`,
       ch,'リスト消化率'),
     apcard('セグメント絞込','🧩','var(--navy-l)','var(--navy)','業態×需要規模×離反確率で自動絞込','中','随時',
       `${g.name}×${price?'小口':'中口'}×離反確率でセグメントを自動生成。優先順位スコアを付与して並べ替え。`,
       'AI','セグメント精度'),
     apcard('自動アサイン','🧭','var(--green-l)','var(--green)','担当・ISへの自動割り当て','中','リスト確定時',
-      price?`価格感応ゾーンは<b>IS/AIへ自動アサイン</b>。フィールド営業の足は使わない。`
+      price?`価格感応ゾーンは<b>IS/AI・広告へ自動アサイン</b>。フィールド営業の足は使わない。`
            :`価値訴求ゾーンは<b>担当営業へエリア×ペルソナで割当</b>。巡回に束ねる。`,
       'SFA','アサイン率')
   ];
+  if(n===1 && custMode==='prospect') cards.push(
+    apcard('広告オーディエンス設計','📣','var(--primary-l)','var(--primary)','未顧客をデジタル広告で捕捉','高','開拓キャンペーン時',
+      `名刺リスト（訪問先）を持たない未顧客には、<b>Eightデータ</b>で<b>${g.name}×${u[3]}×役職</b>のカスタムオーディエンスを作成し、Meta/Google/GDNへ配信する。`,'広告運用／データ','オーディエンス規模・CPA'));
   if(n===2) cards=[
     apcard('提案書','📄','#F1EAFB','var(--purple)',`「${s.theme}」提案書の自動生成`,'高','リスト配信と同時',
       `${g.name}の負荷曲線・契約情報から提案書を自動作成。<br><span style="color:var(--text3)">例：${s.talk}</span>`,'提案支援AI','送付数・開封率'),
@@ -1329,14 +1395,18 @@ function buildSupCard(n){
     apcard('競合・問合せ検知','🔔','var(--red-l)','var(--red)','競合接触・問合せ増の検知','中','常時監視',
       `競合の再エネ/新電力接触や問合せ増を検知し、離反前に先回り接触。`,'AI監視','先回り接触率')
   ];
-  if(n===5) cards=[
+  if(n===5){ cards=[
     apcard('チャネル自動割当','🔀','var(--green-l)','var(--green)','ペルソナ別に最適接点を割当','中','リスト生成時',
-      price?`小口＝<b>メール／SMS／IS（AI自動量産）</b>。フィールドの足は使わない。`:`中口＝<b>フィールド営業＋オンライン面談</b>。ISはアポ前捌き。`,'MA/SFA','チャネル別CVR'),
+      price?`小口＝<b>メール／SMS／IS＋デジタル広告</b>。フィールドの足は使わない。`:`中口＝<b>フィールド営業＋オンライン面談</b>。ISはアポ前捌き。`,'MA/SFA','チャネル別CVR'),
     apcard('配信設計','🗓','var(--blue-l)','var(--blue)','頻度・タイミングの最適化','中','継続',
       `${g.name}の反応データから、配信頻度・曜日時間帯を最適化。過剰接触を抑制。`,'MA','開封/反応率'),
     apcard('フォールバック','↪','var(--navy-l)','var(--navy)','無反応時の次チャネル切替','低','無反応検知時',
-      `一定期間 無反応なら次チャネルへ自動エスカレーション（メール→IS→訪問）。`,'MA/SFA','再接触率')
+      `一定期間 無反応なら次チャネルへ自動エスカレーション（広告→メール→IS→訪問）。`,'MA/SFA','再接触率')
   ];
+    if(custMode==='prospect') cards.push(
+      apcard('デジタル広告配信','📣','var(--primary-l)','var(--primary)','未顧客への広告アプローチ（Meta/Google/GDN）','高','開拓キャンペーン時',
+        `<b>Eightデータ（440万ID・業種×役職×規模）</b>で<b>${g.name}</b>のカスタムオーディエンスを作成し、Meta（FB/Instagram）・Google・GDNへ配信。認知〜リード獲得まで。`,'広告運用／データ','CPA・有効リード率'));
+  }
   if(n===6) cards=[
     apcard('結果タグ付け','🏷','var(--navy-l)','var(--navy)','成約/失注の理由を構造化','中','商談クローズ毎',
       `${g.name}の成約・失注理由をタグ化して蓄積。勝ち筋・負け筋を可視化。`,'データ基盤','タグ付与率'),
@@ -1359,7 +1429,7 @@ function buildSupSummary(){
     [2,'📄','② 提案コンテンツ',`「${s.theme}」の提案書・料金シミュ・見積を自動生成`,'高','リスト配信と同時'],
     [3,'💬','③ トーク・FAQ','想定課題・切り口・競合対抗トークをカード化。スクリプト生成へ','高','商談前'],
     [4,'⏰','④ タイミング','更新期・負荷急変・問合せ増のトリガーで好機通知','中','常時監視'],
-    [5,'🔀','⑤ チャネル振り分け',price?'小口はメール/SMS/IS（AI自動量産）':'中口はフィールド営業＋オンライン面談','中','リスト生成時'],
+    [5,'🔀','⑤ チャネル振り分け',custMode==='prospect'?'未顧客はデジタル広告（Meta/Google/GDN）＋IS/DMで獲得':(price?'小口はメール/SMS/IS（AI自動量産）':'中口はフィールド営業＋オンライン面談'),'中','リスト生成時'],
     [6,'🔄','⑥ ナレッジ循環','成約/失注をペルソナに反映し、暗黙知を全営業へ標準化','中','商談クローズ毎']
   ];
   const flow=`<div class="flow" style="margin-bottom:12px;flex-wrap:wrap"><span class="fstep on">①ターゲティング</span><span class="far">▸</span><span class="fstep on">②提案コンテンツ</span><span class="far">▸</span><span class="fstep on">③トーク・FAQ</span><span class="far">▸</span><span class="fstep on">④タイミング</span><span class="far">▸</span><span class="fstep on">⑤チャネル</span><span class="far">▸</span><span class="fstep on">⑥ナレッジ循環</span></div>`;
@@ -1408,7 +1478,7 @@ function proposalDoc(g,t,s,u,price){
 }
 
 function buildKnowledge(g,t,price,u){
-  const total=Math.max(14,Math.round(u[1]/22));
+  const total=Math.max(14,Math.round(unitCount(g,u)/22));
   const win=Math.round(total*(price?0.5:0.62)), loss=total-win, rate=Math.round(win/total*100);
   const WIN=price?['料金シミュで削減額を即提示できた','更新期3か月前の先回り接触が奏功','切替手続きを全て代行し負担ゼロ','他社より年間総額で安価だった','厨房ピークカット等の業態特化提案']
                  :['省エネ診断の具体数値が刺さった','PPAで初期投資を抑えられた','BCP（非常用電源/蓄電）を評価された','担当の業界知識・提案の信頼性','負荷データに基づく高精度な試算'];
@@ -1436,56 +1506,103 @@ function buildKnowledge(g,t,price,u){
 /* ===== 優先対応リスト（p7）ペルソナ選択＋⑤アクション連動 ===== */
 const PRI_ALL=[['food',0],['office',3],['medical',0],['factory',0],['care',1],['retail',0],['cold',0],['hotel',1],['chain',2],['warehouse',1],['school',1],['fitness',1]];
 const OWNERS=['佐藤','鈴木','田中','高橋','伊藤'];
-const FILTER_LABEL={all:'すべて',price:'価格感応',value:'価値訴求',churn50:'離反確率50%以上',ltv:'高LTV',upd:'更新期3か月内',week:'今週当てる先'};
+const FILTER_LABEL={all:'すべて',price:'価格感応',value:'価値訴求',churn50:'離反確率50%以上',ltv:'高LTV',upd:'更新期3か月内',week:'今週当てる先',su:'中口上',sm:'中口下',ss:'小口下',hi:'高需要'};
 let curPriFilter='all';
 function actLabel(k){const t=PERSONA[k],s=SUP[k];return t.mode==='price'?'料金最適化（AI自動）':s.theme;}
+function acqLabel(k){return PERSONA[k].mode==='price'?'料金メリット訴求（DM/IS）':'省エネ・BCP提案（訪問）';}
+const KW_LABEL={'中口上':'高圧 300–800kW','中口下':'高圧 100–300kW','小口下':'低圧〜高圧 〜100kW'};
 function priRowData(k,ui,area,letter,seed){
-  const t=PERSONA[k],g=SEG60[k],u=g.units[ui],price=t.mode==='price';
+  const t=PERSONA[k],g=SEG60[k],u=g.units[ui],price=t.mode==='price',ex=custMode==='exist';
   const r=(m)=>{seed=(seed*9301+49297)%233280;return seed/233280*m;};
+  const sizeBase=u[3]==='中口上'?34:u[3]==='中口下'?18:6;
   let churn=Math.min(88,Math.round((price?46:20)+r(38)));
   let loy=Math.max(22,Math.min(92,100-churn-Math.round(r(12))));
   let reac=Math.round((price?60:78)+r(price?16:12));
   const upd=r(1)<.38, week=churn>=52;
+  const demand=Math.min(96,Math.round(40+sizeBase+r(26)+(price?0:8))); const hi=demand>=75;
   const modePill=price?'p-blue':'p-red';
-  const churnPill=churn>=55?'p-red':churn>=40?'p-amber':'p-green';
-  const churnCol=churn>=55?'var(--red)':churn>=40?'var(--amber)':'var(--green)';
-  const owner=price?'IS / AI':OWNERS[Math.floor(r(OWNERS.length))];
-  const st=churn>=55?['離反予兆','p-red']:churn>=40?['監視','p-amber']:((!price&&churn<30)?['商談化','p-navy']:['フォロー','p-green']);
+  const owner=ex?(price?'IS / AI':OWNERS[Math.floor(r(OWNERS.length))]):(price?'IS / DM':OWNERS[Math.floor(r(OWNERS.length))]);
   const dt='7/'+String(3+Math.floor(r(26))).padStart(2,'0');
-  const html=`<tr onclick="showPage('p3',document.querySelector('.tn-step[data-page=p3]'))" style="cursor:pointer"><td><div class="t-name">${area}・${u[0]} ${letter}社</div><div class="t-sub">${g.name}${upd?' ・更新期':''}${week?' ・今週':''}</div></td>
-    <td><span class="pill ${modePill}">${g.name}</span> <span class="pill ${SIZE_PILL[u[3]]}">${u[3]}</span></td>
-    <td><span class="pill ${churnPill}">${churn}%</span></td>
-    <td class="mono" style="font-weight:700;color:${churnCol}">${loy}</td>
-    <td class="mono">${reac}%</td>
-    <td>${actLabel(k)}</td><td>${owner}</td><td class="mono">${dt}</td>
-    <td><span class="pill ${st[1]}">${st[0]}</span></td></tr>`;
-  return {mode:t.mode,churn,loy,reac,upd,week,html};
+  let html;
+  if(ex){
+    const churnPill=churn>=55?'p-red':churn>=40?'p-amber':'p-green';
+    const churnCol=churn>=55?'var(--red)':churn>=40?'var(--amber)':'var(--green)';
+    const st=churn>=55?['離反予兆','p-red']:churn>=40?['監視','p-amber']:((!price&&churn<30)?['商談化','p-navy']:['フォロー','p-green']);
+    html=`<tr onclick="showPage('p3',document.querySelector('.tn-step[data-page=p3]'))" style="cursor:pointer"><td><div class="t-name">${area}・${u[0]} ${letter}社</div><div class="t-sub">${g.name}${upd?' ・更新期':''}${week?' ・今週':''}</div></td>
+      <td><span class="pill ${modePill}">${g.name}</span> <span class="pill ${SIZE_PILL[u[3]]}">${u[3]}</span></td>
+      <td><span class="pill ${churnPill}">${churn}%</span></td>
+      <td class="mono" style="font-weight:700;color:${churnCol}">${loy}</td>
+      <td class="mono">${reac}%</td>
+      <td>${actLabel(k)}</td><td>${owner}</td><td class="mono">${dt}</td>
+      <td><span class="pill ${st[1]}">${st[0]}</span></td></tr>`;
+  }else{
+    const dPill=demand>=75?'p-red':demand>=55?'p-amber':'p-gray';
+    const dCol=demand>=75?'var(--green)':'var(--text2)';
+    const st=demand>=78?['商談化','p-navy']:demand>=58?['アプローチ中','p-amber']:['未接触','p-gray'];
+    html=`<tr onclick="showPage('p3',document.querySelector('.tn-step[data-page=p3]'))" style="cursor:pointer"><td><div class="t-name">${area}・${u[0]} ${letter}社</div><div class="t-sub">${g.name}（未契約）</div></td>
+      <td><span class="pill ${modePill}">${g.name}</span> <span class="pill ${SIZE_PILL[u[3]]}">${u[3]}</span></td>
+      <td class="mono">${KW_LABEL[u[3]]}</td>
+      <td><span class="scorebar"><span style="width:${demand}%;background:${demand>=75?'#159A6C':'#57BE93'}"></span></span><b class="mono" style="color:${dCol}">${demand}</b></td>
+      <td>${acqLabel(k)}</td><td>${owner}</td>
+      <td><span class="pill ${st[1]}">${st[0]}</span></td></tr>`;
+  }
+  return {mode:t.mode,size:u[3],churn,loy,reac,upd,week,demand,hi,html};
 }
-function populatePriSelect(){const sel=document.getElementById('pri-select');if(!sel||sel.dataset.done)return;sel.dataset.done=1;let h='<option value="all">全体（全ペルソナ混在）</option>';for(const k in SEG60){const g=SEG60[k];h+=`<optgroup label="${g.bundle}｜${g.name}">`;g.units.forEach((u,i)=>{h+=`<option value="${k}|${i}">${g.name}／${u[0]}｜${u[3]}（${u[1].toLocaleString()}社）</option>`;});h+='</optgroup>';}sel.innerHTML=h;}
-function onPriSelect(){ curPriFilter='all'; document.querySelectorAll('.chips .fchip').forEach((c,x)=>c.classList.toggle('active',x===0)); renderPriority(); }
-function priFilter(f,el){ curPriFilter=f; document.querySelectorAll('.chips .fchip').forEach(c=>c.classList.remove('active')); if(el)el.classList.add('active'); renderPriority(); }
+function populatePriSelect(){const sel=document.getElementById('pri-select');if(!sel||sel.dataset.done)return;sel.dataset.done=1;let h='<option value="all">全体（全ペルソナ混在）</option>';for(const k in SEG60){const g=SEG60[k];h+=`<optgroup label="${g.bundle}｜${g.name}">`;g.units.forEach((u,i)=>{h+=`<option value="${k}|${i}">${g.name}／${u[0]}｜${u[3]}（${unitCount(g,u).toLocaleString()}社）</option>`;});h+='</optgroup>';}sel.innerHTML=h;}
+function onPriSelect(){ curPriFilter='all'; renderPriority(); }
+function priFilter(f,el){ curPriFilter=f; document.querySelectorAll('#pri-chips .fchip').forEach(c=>c.classList.remove('active')); if(el)el.classList.add('active'); renderPriorityTable(); }
+function priChips(){
+  const ex=custMode==='exist';
+  const chips=ex?[['all','すべて'],['price','価格感応'],['value','価値訴求'],['churn50','離反確率50%以上'],['ltv','高LTV'],['upd','更新期3か月内'],['week','今週当てる先']]
+                :[['all','すべて'],['price','価格感応'],['value','価値訴求'],['su','中口上'],['sm','中口下'],['ss','小口下'],['hi','高需要']];
+  document.getElementById('pri-chips').innerHTML=chips.map(c=>`<div class="fchip${c[0]===curPriFilter?' active':''}" onclick="priFilter('${c[0]}',this)">${c[1]}</div>`).join('');
+}
+let PRI_ROWS=[];
 function renderPriority(){
+  const ex=custMode==='exist';
+  document.getElementById('pri-title').textContent=ex?'優先対応リスト ── 既存顧客の攻略':'優先対応リスト ── 未顧客の新規開拓';
+  document.getElementById('pri-sub').textContent=ex?'離反確率・LTV・反応確率でスコアリングし「今週当てる先」を配信':'需要密度・ペルソナ・競合スイッチ余地で開拓優先度をスコアリング';
+  document.getElementById('pri-tag').textContent=ex?'既存 15,000社 / 週次更新':'未顧客 45,000社（仮）/ 週次更新';
+  document.getElementById('pri-banner').innerHTML=ex
+    ?`<div class="tf price"><div class="tf-h">⚡ 価格感応ゾーン｜量で刈り取る <span class="pill p-blue" style="margin-left:auto">7,800社</span></div><ul><li>AIが料金最適化提案を標準テンプレで自動量産</li><li>解約予兆スコアの高い順にデジタル接点／ISで接触</li><li>フィールド営業の足は使わず、仕組みで捕捉</li></ul></div>
+       <div class="tf value"><div class="tf-h">🎯 価値訴求ゾーン｜質で固める <span class="pill p-red" style="margin-left:auto">7,200社</span></div><ul><li>負荷曲線から省エネ余地・BCPニーズの高い先を抽出</li><li>業種別の脱炭素・BCP提案テンプレを営業に供給</li><li>営業がピンポイントで深掘り、高LTVで固定化</li></ul></div>`
+    :`<div class="tf price"><div class="tf-h">⚡ 価格感応ゾーン｜量で獲る <span class="pill p-blue" style="margin-left:auto">約27,000社</span></div><ul><li>飲食・オフィス小口の非契約をDM/デジタル/ISで効率獲得</li><li>料金メリット訴求で切替ハードルの低い層を刈り取り</li><li>フィールド営業は使わず、仕組みで新規捕捉</li></ul></div>
+       <div class="tf value"><div class="tf-h">🎯 価値訴求ゾーン｜質で開拓 <span class="pill p-red" style="margin-left:auto">約18,000社</span></div><ul><li>製造・医療・倉庫中口の非契約を担当営業が新規訪問</li><li>需要密度が高く顧客が薄い空白地を優先開拓</li><li>省エネ・BCP提案と削減試算でスイッチを促す</li></ul></div>`;
+  priChips();
+  renderPriorityTable();
+}
+function renderPriorityTable(){
+  const ex=custMode==='exist';
   const sel=document.getElementById('pri-select'); const val=sel.value||'all';
   const areas=['新宿区','渋谷区','港区','川崎市','横浜市','千葉市','さいたま市','立川市','船橋市','八王子市','大田区','世田谷区'];
+  document.getElementById('pri-thead').innerHTML=ex
+    ?'<tr><th>顧客名</th><th>ペルソナ / 需要規模</th><th>離反確率</th><th>ロイヤリティ</th><th>反応確率</th><th>推奨アクション（⑤連動）</th><th>担当</th><th>次回接触</th><th>ステータス</th></tr>'
+    :'<tr><th>企業名</th><th>ペルソナ / 需要規模</th><th>推定契約電力</th><th>開拓優先度</th><th>推奨アプローチ（⑤連動）</th><th>担当</th><th>ステータス</th></tr>';
   let rows=[], note='';
   if(val==='all'){
     PRI_ALL.forEach((p,i)=>rows.push(priRowData(p[0],p[1],areas[i%areas.length],String.fromCharCode(65+i),(i+3)*97)));
-    note='全ペルソナ混在の優先対応先。<b>ペルソナを選ぶと推奨アクションが⑤営業アクションに連動</b>。フィルタで さらに絞り込めます。';
+    note=ex?'全ペルソナ混在の優先対応先。ペルソナを選ぶと推奨アクションが⑤に連動。フィルタでさらに絞り込めます。':'全ペルソナ混在の新規開拓先。需要密度・ペルソナで優先度をスコアリング。';
   }else{
     const parts=val.split('|'),k=parts[0],idx=+parts[1],t=PERSONA[k],g=SEG60[k],u=g.units[idx],price=t.mode==='price';
     for(let i=0;i<10;i++){rows.push(priRowData(k,idx,areas[i%areas.length],String.fromCharCode(65+i),(i+1)*131+k.length*7));}
-    note=`<b>${g.name}／${u[0]}</b>（${u[3]}・${price?'価格感応':'価値訴求'}）｜母数 ${u[1].toLocaleString()}社。推奨アクション：<b>${actLabel(k)}</b>（⑤営業アクション連動）。`;
+    note=`<b>${g.name}／${u[0]}</b>（${u[3]}・${price?'価格感応':'価値訴求'}）｜母数 ${unitCount(g,u).toLocaleString()}社。推奨${ex?'アクション':'アプローチ'}：<b>${ex?actLabel(k):acqLabel(k)}</b>（⑤連動）。`;
   }
   const f=curPriFilter;
-  const filtered=rows.filter(x=> f==='all'?true : f==='price'?x.mode==='price' : f==='value'?x.mode==='value' : f==='churn50'?x.churn>=50 : f==='ltv'?x.loy>=70 : f==='upd'?x.upd : f==='week'?x.week : true);
-  document.getElementById('pri-tbody').innerHTML=filtered.length?filtered.map(x=>x.html).join(''):`<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:22px">該当なし ── フィルタ「${FILTER_LABEL[f]}」に合う先がありません</td></tr>`;
+  const filtered=rows.filter(x=> f==='all'?true : f==='price'?x.mode==='price' : f==='value'?x.mode==='value'
+    : f==='churn50'?x.churn>=50 : f==='ltv'?x.loy>=70 : f==='upd'?x.upd : f==='week'?x.week
+    : f==='su'?x.size==='中口上' : f==='sm'?x.size==='中口下' : f==='ss'?x.size==='小口下' : f==='hi'?x.hi : true);
+  const cols=ex?9:7;
+  document.getElementById('pri-tbody').innerHTML=filtered.length?filtered.map(x=>x.html).join(''):`<tr><td colspan="${cols}" style="text-align:center;color:var(--text3);padding:22px">該当なし ── フィルタ「${FILTER_LABEL[f]}」に合う先がありません</td></tr>`;
   document.getElementById('pri-note').innerHTML=note+` <span style="color:var(--text3)">｜フィルタ：<b>${FILTER_LABEL[f]}</b>　表示 ${filtered.length}件</span>`;
+  document.getElementById('pri-foot').innerHTML=ex
+    ?'全12,000社を離反確率×LTV×反応確率でスコアリング。共通の仕組み：<b>ペルソナ判定 › 打ち手生成 › 優先度スコアリング › 接点配信 › 効果測定で再学習</b>'
+    :'供給エリア内の非契約（未顧客・仮45,000社）を需要密度×ペルソナで開拓スコアリング。<b>空白地の発見 › アプローチ設計 › 初回接触 › 商談化 › ナレッジ循環</b>';
 }
 function goToTalk(){genTalk();showPage('p6',document.querySelector('.tn-step[data-page=p6]'));}
 function genTalk(){
   const k=CURPK.key,i=CURPK.idx,t=PERSONA[k],s=SUP[k],g=SEG60[k],u=g.units[i];
   const price=t.mode==='price', first=price?'料金シミュレーション':'無料の省エネ診断';
-  document.getElementById('talk-meta').innerHTML=`<div class="selbox"><span class="sl">対象</span>${g.name}／${u[0]}</div><div class="selbox"><span class="sl">需要規模</span>${u[3]}</div><div class="selbox"><span class="sl">クラスタ</span>${t.cluster}</div><div class="selbox"><span class="sl">提案テーマ</span>${s.theme}</div><div class="selbox"><span class="sl">チャネル</span>${price?'メール/IS 中心':'営業訪問 中心'}</div>`;
+  document.getElementById('talk-meta').innerHTML=`<div class="selbox"><span class="sl">顧客区分</span>${custMode==='exist'?'既存顧客（維持・深耕）':'未顧客（新規開拓）'}</div><div class="selbox"><span class="sl">対象</span>${g.name}／${u[0]}</div><div class="selbox"><span class="sl">需要規模</span>${u[3]}</div><div class="selbox"><span class="sl">クラスタ</span>${t.cluster}</div><div class="selbox"><span class="sl">提案テーマ</span>${s.theme}</div><div class="selbox"><span class="sl">チャネル</span>${price?'メール/IS 中心':'営業訪問 中心'}</div>`;
   document.getElementById('tk-visit').textContent=`${s.talk}\n\n更新期や電力使用量の動きから見ても、いまが検討しやすいタイミングです。まずは${first}から始めさせてください。`;
   document.getElementById('tk-mail').textContent=`件名：【東京電力EP】${g.name}さま向け ${s.theme} のご案内\n\nご担当者さま\n\nいつもお世話になっております。東京電力エナジーパートナーでございます。\n\n${s.talk}\n\nつきましては、${first}をご提案させてください。ご都合のよい日程を2〜3ついただけますと幸いです。`;
   document.getElementById('tk-call').textContent=`【架電スクリプト】\n\n〈導入〉お世話になっております、東京電力EPでございます。3分ほどよろしいでしょうか。\n\n〈本題〉${s.talk}\n\n〈クロージング〉まずは${first}だけでもいかがでしょうか。来週あたりで30分お時間いただけませんか？\n\n〈想定切り返し〉「他社からも提案が来ている」→ 御社の負荷データに基づく内容ですので、一般的な提案とは精度が違います。`;
@@ -1539,30 +1656,87 @@ function buildGsiMap(){
   // 担当営業エリア
   [[35.69,139.70,'佐藤（4名）','#0A6EBD',7000],[35.47,139.63,'鈴木（3名）','#159A6C',6500],[35.70,139.45,'田中（2名）','#D97706',6000],[35.66,139.98,'高橋（2名）','#7C4DBB',6500],[35.86,139.63,'伊藤（1名）','#0E8AA0',5500]]
     .forEach(([la,ln,nm,c,r])=>{L.circle([la,ln],{radius:r,color:c,weight:2,dashArray:'5 6',fillColor:c,fillOpacity:.05}).addTo(gsiLayers.area).bindTooltip('担当エリア：'+nm,{sticky:true});});
-  // 顧客ピン（1社1ピン・ペルソナ色分け・離反リスク強調）
-  const colors={office:'#0A6EBD',food:'#D97706',mfg:'#E60012',facility:'#0E8AA0'};
-  const pnames={office:'オフィス・事務',food:'商業・飲食',mfg:'製造・物流',facility:'施設・公共/医療'};
-  const acts={office:'更新期メール／IS',food:'料金最適化（AI自動）',mfg:'省エネ診断→PPA',facility:'BCP・省エネ提案'};
-  const clusters=[
-    [35.690,139.700,.06,'food',42],[35.688,139.702,.065,'office',26],[35.685,139.705,.05,'facility',10], // 東京23区
-    [35.470,139.630,.06,'mfg',30],[35.472,139.632,.055,'facility',14],[35.468,139.635,.05,'food',10],    // 川崎・横浜
-    [35.700,139.450,.06,'office',20],[35.702,139.452,.05,'facility',8],[35.698,139.455,.05,'food',8],     // 多摩
-    [35.860,139.630,.06,'office',16],[35.862,139.632,.055,'food',14],[35.858,139.635,.05,'facility',6],   // 埼玉南部
-    [35.655,139.980,.07,'mfg',24],[35.660,139.985,.06,'facility',12],[35.650,139.975,.05,'office',8],     // 千葉ベイ
-  ];
+  drawGisPins();
+  setTimeout(()=>gsiMap.invalidateSize(),80);
+}
+const GIS_COLORS={office:'#0A6EBD',food:'#D97706',mfg:'#E60012',facility:'#0E8AA0'};
+const GIS_PN={office:'オフィス・事務',food:'商業・飲食',mfg:'製造・物流',facility:'施設・公共/医療'};
+const GIS_ACT={office:'更新期メール／IS',food:'料金最適化（AI自動）',mfg:'省エネ診断→PPA',facility:'BCP・省エネ提案'};
+const GIS_ACQ={office:'省エネDM／IS',food:'料金メリット訴求（IS）',mfg:'省エネ診断・PPA提案',facility:'BCP・省エネ提案'};
+const GIS_CLUSTERS=[
+  [35.690,139.700,.06,'food',42],[35.688,139.702,.065,'office',26],[35.685,139.705,.05,'facility',10],
+  [35.470,139.630,.06,'mfg',30],[35.472,139.632,.055,'facility',14],[35.468,139.635,.05,'food',10],
+  [35.700,139.450,.06,'office',20],[35.702,139.452,.05,'facility',8],[35.698,139.455,.05,'food',8],
+  [35.860,139.630,.06,'office',16],[35.862,139.632,.055,'food',14],[35.858,139.635,.05,'facility',6],
+  [35.655,139.980,.07,'mfg',24],[35.660,139.985,.06,'facility',12],[35.650,139.975,.05,'office',8],
+];
+function drawGisPins(){
+  if(!gsiMap||!gsiLayers.pins) return;
+  gsiLayers.pins.clearLayers(); gsiLayers.risk.clearLayers();
+  const ex=custMode==='exist';
   let seed=13;const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};
   let idc=1;
-  clusters.forEach(([la,ln,sp,type,n])=>{
-    for(let i=0;i<n;i++){
+  GIS_CLUSTERS.forEach(([la,ln,sp,type,n])=>{
+    const cnt=ex?n:Math.round(n*1.8);
+    for(let i=0;i<cnt;i++){
       const a=la+(rnd()-.5)*sp, o=ln+(rnd()-.5)*sp*1.5;
-      const churn=Math.round((type==='food'?45:18)+rnd()*45);
-      const risk=churn>=55, c=risk?'#DC2626':colors[type];
-      const m=L.circleMarker([a,o],{radius:risk?8:5,color:'#fff',weight:1.5,fillColor:c,fillOpacity:.92});
-      m.bindPopup(`<b>${pnames[type]}</b>（デモ ${idc}社目）<br>ペルソナ：${type}／${risk?'<b style="color:#DC2626">離反リスク高</b>':'安定'}<br>離反確率：<b style="color:${risk?'#DC2626':'#159A6C'}">${churn}%</b><br>推奨アクション：${acts[type]}`);
-      m.addTo(risk?gsiLayers.risk:gsiLayers.pins); idc++;
+      if(ex){
+        const churn=Math.round((type==='food'?45:18)+rnd()*45);
+        const risk=churn>=55, c=risk?'#DC2626':GIS_COLORS[type];
+        const m=L.circleMarker([a,o],{radius:risk?8:5,color:'#fff',weight:1.5,fillColor:c,fillOpacity:.92});
+        m.bindPopup(`<b>${GIS_PN[type]}</b>（既存・デモ ${idc}社目）<br>${risk?'<b style="color:#DC2626">離反リスク高</b>':'安定'}／離反確率 <b style="color:${risk?'#DC2626':'#159A6C'}">${churn}%</b><br>推奨：${GIS_ACT[type]}`);
+        m.addTo(risk?gsiLayers.risk:gsiLayers.pins);
+      }else{
+        const demand=Math.round(40+rnd()*55), hi=demand>=75, c=hi?'#159A6C':'#57BE93';
+        const m=L.circleMarker([a,o],{radius:hi?8:5,color:'#fff',weight:1.5,fillColor:c,fillOpacity:.9});
+        m.bindPopup(`<b>${GIS_PN[type]}</b>（未顧客・デモ ${idc}社目）<br>${hi?'<b style="color:#159A6C">高需要</b>':'需要中'}／推定需要スコア <b style="color:#159A6C">${demand}</b><br>推奨アプローチ：${GIS_ACQ[type]}`);
+        m.addTo(hi?gsiLayers.risk:gsiLayers.pins);
+      }
+      idc++;
     }
   });
-  setTimeout(()=>gsiMap.invalidateSize(),80);
+}
+const STRAT_EXIST=`<div class="card"><div class="card-hd">🧭 営業割り当て方針（既存顧客の維持・深耕）<span class="sub">エリア × ペルソナ × 離反リスク</span></div>
+  <div class="two-front">
+    <div class="tf price"><div class="tf-h">⚡ 価格感応ゾーン｜量で維持（IS/AI中心）</div><ul><li>飲食小口・オフィス小口＝<b>フィールド営業を割り当てない</b></li><li>離反予兆スコアの高い順に<b>メール/SMS/IS・AI自動提案</b>で先回り</li><li>例：新宿・渋谷の飲食小口の離反密集ゾーンを自動接触</li></ul></div>
+    <div class="tf value"><div class="tf-h">🎯 価値訴求ゾーン｜質で固める（フィールド営業）</div><ul><li>製造・医療・倉庫の中口＝<b>担当営業が対面で深掘り</b></li><li>省エネ余地・BCPニーズの高い順に担当へ割り当て</li><li>例：川崎・横浜臨海の製造中口を鈴木チームが専任担当</li></ul></div>
+  </div>
+  <div class="note" style="margin-top:10px">解約予兆の検知 → 流出前の先回り接触を一気通貫で回し、<b>営業の足を価値訴求ゾーンへ再配置</b>する。</div></div>`;
+const STRAT_PROS=`<div class="card" style="border-color:var(--green-l2)"><div class="card-hd" style="color:var(--green)">🌱 新規開拓方針（未顧客の獲得）<span class="sub">需要密度 × ペルソナ × 競合</span></div>
+  <div class="two-front">
+    <div class="tf price"><div class="tf-h">⚡ 価格感応ゾーン｜量で獲る（デジタル/IS）</div><ul><li>飲食・オフィス小口の非契約＝<b>DM/デジタル広告/ISで効率獲得</b></li><li>料金メリットを訴求し、切替ハードルの低い層を刈り取り</li><li>例：新宿・渋谷の飲食小口の空白をIS一括アプローチ</li></ul></div>
+    <div class="tf value"><div class="tf-h">🎯 価値訴求ゾーン｜質で開拓（フィールド営業）</div><ul><li>製造・医療・倉庫の中口の非契約＝<b>担当営業が新規訪問</b></li><li>需要密度が高く顧客が薄い空白地を優先開拓</li><li>例：川崎・横浜臨海の製造中口の空白を鈴木チームが開拓</li></ul></div>
+  </div>
+  <div class="note" style="margin-top:10px">需要ヒートマップ濃×契約薄の<b>空白地</b>を機械抽出し、競合スイッチ余地の高い順に開拓リソースを配分する。<span style="color:var(--text3)">※社数は仮値。</span></div></div>`;
+const CARDS_EXIST=`
+  <div class="card"><div class="card-hd">🧭 担当割り当て<span class="sub">エリア × ペルソナ</span></div><div class="note" style="line-height:1.8">誰がどこを持つかを最適化。<br>例：<b>川崎・横浜の製造中口＝鈴木チーム</b>／新宿・渋谷の飲食小口＝<b>IS/AIで自動捕捉</b>。</div></div>
+  <div class="card"><div class="card-hd">🚗 巡回ルート最適化<span class="sub">高LTV先を束ねる</span></div><div class="note" style="line-height:1.8">近い高LTV先をまとめて1日巡回。<br>例：<b>川崎臨海の製造・冷凍倉庫8社</b>を最短ルートで訪問。更新期・離反予兆順に自動整列。</div></div>
+  <div class="card"><div class="card-hd">🛡 離反防止の先回り<span class="sub">予兆検知</span></div><div class="note" style="line-height:1.8">離反予兆の高いゾーンへ流出前に接触。<br>例：新宿・渋谷の飲食小口の予兆密集を<b>IS/AIで自動先回り</b>。</div></div>`;
+const CARDS_PROS=`
+  <div class="card" style="border-color:var(--green-l2)"><div class="card-hd">🎯 開拓ターゲティング<span class="sub">需要密度スコア</span></div><div class="note" style="line-height:1.8">需要密度が高く契約が薄い空白地を抽出。<br>例：<b>川崎・横浜臨海（製造中口）</b>、<b>幕張・千葉ベイ（物流）</b>を優先。</div></div>
+  <div class="card" style="border-color:var(--green-l2)"><div class="card-hd">📨 初回アプローチ設計<span class="sub">チャネル × トーク</span></div><div class="note" style="line-height:1.8">価格感応＝DM/デジタル/IS、価値訴求＝訪問。<br>ペルソナ別の初回トーク（料金メリット／省エネ・BCP）を自動生成。</div></div>
+  <div class="card" style="border-color:var(--green-l2)"><div class="card-hd">🔀 競合スイッチ狙い<span class="sub">乗換余地</span></div><div class="note" style="line-height:1.8">新電力/他社契約で不満・更新期接近の先を推定。<br>負荷データに基づく削減試算で<b>スイッチ提案</b>を先出し。</div></div>`;
+function refreshGis(){
+  if(!document.getElementById('gis-ai')) return;
+  const ex=custMode==='exist';
+  document.getElementById('gis-title').textContent=ex?'GIS／エリアマップ ── 既存顧客の攻略':'GIS／エリアマップ ── 未顧客の新規開拓';
+  document.getElementById('gis-sub').textContent=ex?'どのエリアに・どのペルソナが・どれだけいるか。担当割り当てと巡回で既存顧客を維持・深耕':'供給エリア内の非契約（未顧客）を需要密度で可視化。新規開拓の優先エリアとアプローチを設計';
+  document.getElementById('gis-ai').innerHTML=ex
+    ?'<b>離反リスクの可視化：</b><b>新宿・渋谷</b>は飲食小口の離反リスクが密集、<b>川崎・横浜臨海</b>は製造中口の高LTV。ピンクリックで離反確率・推奨アクション。担当×エリアで巡回を再設計。'
+    :'<b>空白地＝開拓余地：</b><b>川崎・横浜臨海部</b>は製造中口の需要密度が高いが非契約が多い最優先開拓地。<b>幕張・千葉ベイ</b>は物流の集積。需要ヒートマップ×競合圏で狙う。';
+  document.getElementById('gis-area-title').innerHTML=ex?'エリア別サマリ<span class="sub">担当割り当て</span>':'エリア別 未顧客サマリ<span class="sub">開拓優先度</span>';
+  document.getElementById('gis-area-head').innerHTML=ex?'<tr><th>エリア</th><th>社数</th><th>離反高</th><th>担当</th></tr>':'<tr><th>エリア</th><th>未顧客数</th><th>高需要</th><th>担当</th></tr>';
+  const rows=ex
+    ?[['東京23区','5,240','720','p-red','佐藤(4)'],['川崎・横浜','3,180','340','p-amber','鈴木(3)'],['多摩・武蔵野','2,410','280','p-amber','田中(2)'],['千葉ベイ','1,870','190','p-red','高橋(2)'],['埼玉南部','2,300','110','p-amber','伊藤(1)']]
+    :[['東京23区','16,800','2,100','p-red','佐藤(4)'],['川崎・横浜','9,600','1,900','p-red','鈴木(3)'],['多摩・武蔵野','6,200','620','p-amber','田中(2)'],['千葉ベイ','7,400','1,400','p-red','高橋(2)'],['埼玉南部','5,000','480','p-amber','伊藤(1)']];
+  document.getElementById('gis-area-body').innerHTML=rows.map(r=>`<tr><td class="t-name">${r[0]}</td><td class="mono">${r[1]}</td><td><span class="pill ${r[3]}">${r[2]}</span></td><td>${r[4]}</td></tr>`).join('');
+  document.getElementById('gis-area-note').innerHTML=ex?'既存顧客データに「座標」と「ペルソナ」の2列を足すだけで地図/BIに載る。':'未顧客は企業DB・GIS・SanSan/Eight等で座標化。需要密度の高い順に開拓。※社数は仮値。';
+  document.getElementById('gis-legend-risk').innerHTML=ex?'<span class="lgd" style="width:14px;height:14px;background:var(--red)"></span><b>大きい赤＝離反リスク高</b>（≥55%）':'<span class="lgd" style="width:14px;height:14px;background:#159A6C"></span><b>大きい緑＝高需要</b>（推定）';
+  document.getElementById('gis-pin-risk').innerHTML=ex?'<span style="width:18px;height:18px;border-radius:50%;background:var(--red);border:1.5px solid #fff;box-shadow:0 0 0 1px var(--border);flex-shrink:0"></span><span style="font-size:11px"><b style="color:var(--red)">大きい赤ピン</b>＝離反確率 <b>55%以上</b></span>':'<span style="width:18px;height:18px;border-radius:50%;background:#159A6C;border:1.5px solid #fff;box-shadow:0 0 0 1px var(--border);flex-shrink:0"></span><span style="font-size:11px"><b style="color:var(--green)">大きい緑ピン</b>＝推定需要 <b>高</b></span>';
+  document.getElementById('gis-pin-note').innerHTML=ex?'<b>色＝ペルソナ業態</b>、<b>サイズ・赤＝離反リスク</b>、<b>面の濃淡＝需要密度</b>。クリックで離反確率・推奨アクション。':'<b>色＝ペルソナ業態</b>、<b>サイズ・濃緑＝推定需要の高さ</b>、<b>面の濃淡＝需要密度</b>。クリックで推定需要・推奨アプローチ。';
+  document.getElementById('gis-strategy').innerHTML=ex?STRAT_EXIST:STRAT_PROS;
+  document.getElementById('gis-3cards').innerHTML=ex?CARDS_EXIST:CARDS_PROS;
+  drawGisPins();
 }
 function toggleLayer(name,el){
   el.classList.toggle('on');
@@ -1573,7 +1747,7 @@ function toggleLayer(name,el){
 
 /* ===== CHART BUILDERS ===== */
 function initCharts(page){
-  if(chartInit[page]) { if(page==='p4') buildGsiMap(); return; }
+  if(chartInit[page]) { if(page==='p4'){ buildGsiMap(); refreshGis(); } return; }
   chartInit[page]=true;
   const noGrid={grid:{display:false}}, softGrid={grid:{color:'#EEF2F7'},border:{display:false}};
 
@@ -1581,7 +1755,7 @@ function initCharts(page){
     new Chart(c_care,{type:'doughnut',data:{labels:['ケア済み','未ケア（AI捕捉）'],datasets:[{data:[3000,12000],backgroundColor:[GREEN,RED],borderWidth:2,borderColor:'#fff'}]},options:{cutout:'62%',plugins:{legend:{position:'bottom'}}}});
     new Chart(c_status,{type:'doughnut',data:{labels:['ロイヤル','継続見込み','離反見込み'],datasets:[{data:[4180,9180,1640],backgroundColor:[BLUE,'#9DBFDD',RED],borderWidth:2,borderColor:'#fff'}]},options:{cutout:'62%',plugins:{legend:{position:'bottom'}}}});
     new Chart(c_scale,{type:'bar',data:{labels:['小口下','中口下','中口上'],datasets:[{label:'社数',data:[8700,4500,1800],backgroundColor:[NAVY,BLUE,RED],borderRadius:5,barThickness:44}]},options:{plugins:{legend:{display:false}},scales:{x:noGrid,y:softGrid}}});
-    drill('food'); // 12業態→60→180 ドリルの初期表示（最多セグメント）
+    buildBiz12(); drill('food'); // 12業態→60→180 ドリルの初期表示（最多セグメント）
   }
 
   if(page==='p2'){
@@ -1594,7 +1768,7 @@ function initCharts(page){
     new Chart(c_load_a,{type:'line',data:{labels:hrs,datasets:[{label:'A社 負荷',data:[25,82,90,86,62,32,18],borderColor:GREEN,backgroundColor:'rgba(21,154,108,.12)',fill:true,tension:.35,borderWidth:2,pointRadius:3}]},options:{plugins:{legend:{display:false}},scales:{x:noGrid,y:{...softGrid,min:0,max:100}}}});
   }
 
-  if(page==='p4'){ buildGsiMap(); }
+  if(page==='p4'){ buildGsiMap(); refreshGis(); }
 }
 initCharts('p1');
 </script>
